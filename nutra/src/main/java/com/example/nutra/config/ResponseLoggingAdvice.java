@@ -31,21 +31,23 @@ public class ResponseLoggingAdvice implements ResponseBodyAdvice<Object> {
         }
 
         try {
-            System.out.println("\n=======================================================");
-            System.out.println("API HIT -> " + request.getMethod() + " " + request.getURI().getPath());
-            System.out.println("RESPONSE DATA SENT TO FRONTEND:");
-
-            if (body != null) {
-                // Convert the response to formatted JSON for clean console reading
-                String jsonResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(body);
-                System.out.println(jsonResponse);
-            } else {
-                System.out.println("No Response Body (Empty / Void)");
-            }
-            System.out.println("=======================================================\n");
+            // System.out.println("\n=======================================================");
+            // System.out.println("API HIT -> " + request.getMethod() + " " +
+            // request.getURI().getPath());
+            // System.out.println("RESPONSE DATA SENT TO FRONTEND:");
+            //
+            // if (body != null) {
+            // // Convert the response to formatted JSON for clean console reading
+            // String jsonResponse =
+            // objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(body);
+            // System.out.println(jsonResponse);
+            // } else {
+            // System.out.println("No Response Body (Empty / Void)");
+            // }
+            // System.out.println("=======================================================\n");
 
         } catch (Exception e) {
-            System.out.println("Error logging response: " + e.getMessage());
+            // System.out.println("Error logging response: " + e.getMessage());
         }
 
         return body;

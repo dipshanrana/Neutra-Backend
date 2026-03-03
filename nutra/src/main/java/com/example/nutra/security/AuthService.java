@@ -28,15 +28,36 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public LoginResponse login(LoginRequest loginRequest) {
+    public LoginResponse adminLogin(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
         User user = (User) authentication.getPrincipal();
+
+        if (user.getRole() != RoleType.ADMIN) {
+            throw new RuntimeException("Access denied. Not an admin account.");
+        }
+
         String token = authUtil.generateAccessToken(user);
         LoginResponse loginResponse = modelMapper.map(user, LoginResponse.class);
+        loginResponse.setUserId(user.getId().toString());
         loginResponse.setJwtToken(token);
         return loginResponse;
+    }
 
+    public LoginResponse userLogin(LoginRequest loginRequest) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+        User user = (User) authentication.getPrincipal();
+
+        if (user.getRole() != RoleType.CUSTOMER) {
+            throw new RuntimeException("Access denied. Not a customer account.");
+        }
+
+        String token = authUtil.generateAccessToken(user);
+        LoginResponse loginResponse = modelMapper.map(user, LoginResponse.class);
+        loginResponse.setUserId(user.getId().toString());
+        loginResponse.setJwtToken(token);
+        return loginResponse;
     }
 
     public LoginResponse signup(SignupRequest signupRequest) {
@@ -56,6 +77,7 @@ public class AuthService {
 
         String token = authUtil.generateAccessToken(user);
         LoginResponse loginResponse = modelMapper.map(user, LoginResponse.class);
+        loginResponse.setUserId(user.getId().toString());
         loginResponse.setJwtToken(token);
         return loginResponse;
     }

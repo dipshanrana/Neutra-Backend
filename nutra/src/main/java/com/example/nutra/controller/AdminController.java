@@ -13,6 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000")
 public class AdminController {
 
     private final AuthService authService;

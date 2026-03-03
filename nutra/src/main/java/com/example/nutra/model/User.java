@@ -17,8 +17,10 @@ import java.util.Collection;
 import java.util.List;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "users")
 @Inheritance(strategy = InheritanceType.JOINED)
 @Getter
 @Setter

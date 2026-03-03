@@ -13,17 +13,18 @@ import java.util.Date;
 
 @Component
 public class AuthUtil {
-    @Value("${jwt.secretkey}")
+    @Value("${jwt.secretKey}")
     private String secretkey;
 
-    private SecretKey secretKey(){
+    private SecretKey secretKey() {
         return Keys.hmacShaKeyFor(secretkey.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateAccessToken(User user){
-        return Jwts.builder().setSubject(user.getUsername()).signWith(secretKey()).setExpiration(new Date(System.currentTimeMillis()+1000*60*60)).setIssuedAt(new Date()).claim("UserId",user.getId().toString()).compact();
+    public String generateAccessToken(User user) {
+        return Jwts.builder().setSubject(user.getUsername()).signWith(secretKey())
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)).setIssuedAt(new Date())
+                .claim("UserId", user.getId().toString()).compact();
     }
-
 
     public String getUsername(String token) {
         Claims claims = Jwts.parserBuilder().setSigningKey(secretKey()).build().parseClaimsJws(token).getBody();
