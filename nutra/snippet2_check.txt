@@ -1,0 +1,48 @@
+﻿
+  "threeProductImage": "iVBORw0KGgoAAA...",
+  "benefits": [
+    {
+      "svg": "<svg>...</svg>",
+      "nutrientName": "Protein",
+      "benefitDescription": "Builds lean muscle"
+    }
+  ],
+  "servingSize": "1 Scoop (30g)",
+  "capsulesPerContainer": "30 Scoops",
+  "supplementFacts": [
+    {
+      "nutrientName": "Whey Protein Isolate",
+      "amountPerServing": "25g",
+      "amount": "83%"
+    }
+  ],
+  "reviews": [
+    {
+      "username": "john_lifter",
+      "stars": 5,
+      "comment": "Great taste and mixes well!"
+    }
+  ],
+  "freebies": [
+    "Free Shaker",
+    "Free Shipping over $50"
+  ],
+  "howToUse": [
+    "Mix one scoop with 250ml of water",
+    "Drink immediately after workout"
+  ]
+}
+```
+
+**Success Response (201 Created):**
+```json
+{
+  "id": 1,
+  "name": "Whey Protein Isolate",
+  "link": "https://example.com/products/whey-protein",
+  "category": {
+    "id": 1,
+    "name": "Supplements",
+    "svg": "<svg>...</svg>"
+  },
+  "descr

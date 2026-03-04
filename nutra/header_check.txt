@@ -1,0 +1,254 @@
+﻿# Nutra Backend — API Endpoints Documentation
+
+> **Base URL:** `http://localhost:8080/api`
+>
+> All endpoints below are relative to this base URL.
+> For example, `POST /auth/login` means `POST http://localhost:8080/api/auth/login`
+
+---
+
+## 🔑 Default Admin Credentials
+
+A static admin account is auto-seeded on first startup:
+
+| Field    | Value            |
+|----------|------------------|
+| Username | `admin@admin.com`|
+| Password | `admin123`       |
+
+---
+
+## 🔐 Authentication Headers
+
+For endpoints marked **🔒 ADMIN**, you must include a JWT token in the request header:
+
+```
+Authorization: Bearer <your-jwt-token>
+```
+
+You can obtain a token by calling the **Login** or **Signup** endpoints.
+
+---
+
+---
+
+## 1. Authentication Endpoints
+
+### 1.1 Admin Login
+
+| Property    | Value                |
+|-------------|----------------------|
+| **Method**  | `POST`               |
+| **URL**     | `/auth/admin/login`  |
+| **Auth**    | None                 |
+
+> Only users with the **ADMIN** role can log in through this endpoint. Attempting to log in with a CUSTOMER account will return an error.
+
+**Request Body:**
+```json
+{
+  "username": "admin@admin.com",
+  "password": "admin123"
+}
+```
+
+**Success Response (200 OK):**
+```json
+{
+  "userId": "1",
+  "username": "admin@admin.com",
+  "JwtToken": "eyJhbGciOiJIUzI1NiJ9..."
+}
+```
+
+**Error Response (400 Bad Request):**
+```json
+{
+  "error": "Access denied. Not an admin account."
+}
+```
+
+---
+
+### 1.2 User Login
+
+| Property    | Value                |
+|-------------|----------------------|
+| **Method**  | `POST`               |
+| **URL**     | `/auth/user/login`   |
+| **Auth**    | None                 |
+
+> Only users with the **CUSTOMER** role can log in through this endpoint. Attempting to log in with an ADMIN account will return an error.
+
+**Request Body:**
+```json
+{
+  "username": "johndoe",
+  "password": "password123"
+}
+```
+
+**Success Response (200 OK):**
+```json
+{
+  "userId": "2",
+  "username": "johndoe",
+  "JwtToken": "eyJhbGciOiJIUzI1NiJ9..."
+}
+```
+
+**Error Response (400 Bad Request):**
+```json
+{
+  "error": "Access denied. Not a customer account."
+}
+```
+
+---
+
+### 1.3 Signup
+
+| Property    | Value                |
+|-------------|----------------------|
+| **Method**  | `POST`               |
+| **URL**     | `/auth/signup`       |
+| **Auth**    | None                 |
+
+> Signup always creates a **CUSTOMER** role user. Admins can only be created via the Admin endpoint.
+
+**Request Body:**
+```json
+{
+  "username": "janedoe",
+  "password": "password123"
+}
+```
+
+**Success Response (200 OK):**
+```json
+{
+  "userId": "3",
+  "username": "janedoe",
+  "JwtToken": "eyJhbGciOiJIUzI1NiJ9..."
+}
+```
+
+---
+
+---
+
+## 2. Admin Endpoints
+
+> All admin endpoints require **🔒 ADMIN** role JWT token.
+
+### 2.1 Create New Admin
+
+| Property    | Value                  |
+|-------------|------------------------|
+| **Method**  | `POST`                 |
+| **URL**     | `/admin/users/admin`   |
+| **Auth**    | 🔒 ADMIN              |
+
+**Request Body:**
+```json
+{
+  "username": "newadmin@admin.com",
+  "password": "securePassword123"
+}
+```
+
+**Success Response (201 Created):**
+```json
+{
+  "id": 3,
+  "username": "newadmin@admin.com",
+  "role": "ADMIN"
+}
+```
+
+---
+
+### 2.2 Get All Registered Users
+
+| Property    | Value                  |
+|-------------|------------------------|
+| **Method**  | `GET`                  |
+| **URL**     | `/admin/users`         |
+| **Auth**    | 🔒 ADMIN              |
+
+**Success Response (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "username": "admin@admin.com",
+    "role": "ADMIN"
+  },
+  {
+    "id": 2,
+    "username": "johndoe",
+    "role": "CUSTOMER"
+  }
+]
+```
+
+---
+
+---
+
+## 3. Category Endpoints
+
+### 3.1 Create Category
+
+| Property    | Value                  |
+|-------------|------------------------|
+| **Method**  | `POST`                 |
+| **URL**     | `/categories`          |
+| **Auth**    | 🔒 ADMIN              |
+
+**Request Body:**
+```json
+{
+  "name": "Supplements",
+  "svg": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 2L2 7l10 5 10-5-10-5z'/></svg>"
+}
+```
+
+**Success Response (201 Created):**
+```json
+{
+  "id": 1,
+  "name": "Supplements",
+  "svg": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 2L2 7l10 5 10-5-10-5z'/></svg>"
+}
+```
+
+---
+
+### 3.2 Get All Categories
+
+| Property    | Value                  |
+|-------------|------------------------|
+| **Method**  | `GET`                  |
+| **URL**     | `/categories`          |
+| **Auth**    | None (Public)          |
+
+**Success Response (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "name": "Supplements",
+    "svg": "<svg>...</svg>"
+  },
+  {
+    "id": 2,
+    "name": "Vitamins",
+    "svg": "<svg>...</svg>"
+  }
+]
+```
+
+---
+
+### 3.3 Get Cate

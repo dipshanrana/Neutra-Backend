@@ -55,9 +55,9 @@ You can obtain a token by calling the **Login** or **Signup** endpoints.
 **Success Response (200 OK):**
 ```json
 {
-  "id": 1,
+  "userId": "1",
   "username": "admin@admin.com",
-  "jwtToken": "eyJhbGciOiJIUzI1NiJ9..."
+  "JwtToken": "eyJhbGciOiJIUzI1NiJ9..."
 }
 ```
 
@@ -91,9 +91,9 @@ You can obtain a token by calling the **Login** or **Signup** endpoints.
 **Success Response (200 OK):**
 ```json
 {
-  "id": 2,
+  "userId": "2",
   "username": "johndoe",
-  "jwtToken": "eyJhbGciOiJIUzI1NiJ9..."
+  "JwtToken": "eyJhbGciOiJIUzI1NiJ9..."
 }
 ```
 
@@ -122,14 +122,14 @@ You can obtain a token by calling the **Login** or **Signup** endpoints.
   "username": "janedoe",
   "password": "password123"
 }
-```
+
 
 **Success Response (200 OK):**
 ```json
 {
-  "id": 3,
+  "userId": "3",
   "username": "janedoe",
-  "jwtToken": "eyJhbGciOiJIUzI1NiJ9..."
+  "JwtToken": "eyJhbGciOiJIUzI1NiJ9..."
 }
 ```
 
@@ -320,69 +320,92 @@ You can obtain a token by calling the **Login** or **Signup** endpoints.
 | **Method**  | `POST`                 |
 | **URL**     | `/products`            |
 | **Auth**    | 🔒 ADMIN              |
+| **Content-Type** | `multipart/form-data` |
 
 > If the category name doesn't exist, it is automatically created.
 
-**Request Body:**
-```json
-{
-  "name": "Whey Protein Isolate",
-  "link": "https://example.com/products/whey-protein",
-  "category": {
-    "name": "Supplements",
-    "svg": "<svg>...</svg>"
-  },
-  "description": "Premium whey protein isolate for lean muscle growth.",
-  "singleProductMp": 3500.0,
-  "singleProductSp": 2800.0,
-  "twoProductMp": 7000.0,
-  "twoProductSp": 5000.0,
-  "threeProductMp": 10500.0,
-  "threeProductSp": 7000.0,
-  "discount": 20.0,
-  "featuredImages": [
-    "https://example.com/featured-1.jpg",
-    "https://example.com/featured-2.jpg",
-    "https://example.com/featured-3.jpg",
-    "https://example.com/featured-4.jpg",
-    "https://example.com/featured-5.jpg"
-  ],
-  "singleProductImage": "https://example.com/single.jpg",
-  "twoProductImage": "https://example.com/two.jpg",
-  "threeProductImage": "https://example.com/three.jpg",
-  "images": [
-    "https://example.com/whey-front.jpg",
+**Request Parts (Multipart):**
 
-    "https://example.com/whey-back.jpg"
-  ],
-  "benefits": [
+1.  **`product` (Content-Type: `application/json`)**:
+    ```json
     {
-      "svg": "<svg>...</svg>",
-      "nutrientName": "Protein",
-      "benefitDescription": "Builds lean muscle"
+      "name": "Whey Protein Isolate",
+      "link": "https://example.com/products/whey-protein",
+      "category": {
+        "name": "Supplements",
+        "svg": "<svg>...</svg>"
+      },
+      "description": "Premium whey protein isolate for lean muscle growth.",
+      "singleProductMp": 3500.0,
+      "singleProductSp": 2800.0,
+      "twoProductMp": 7000.0,
+      "twoProductSp": 5000.0,
+      "threeProductMp": 10500.0,
+      "threeProductSp": 7000.0,
+      "discount": 20.0,
+      "benefits": [
+        {
+          "svg": "<svg>...</svg>",
+          "nutrientName": "Protein",
+          "benefitDescription": "Builds lean muscle"
+        }
+      ],
+      "servingSize": "1 Scoop (30g)",
+      "capsulesPerContainer": "30 Scoops",
+      "supplementFacts": [
+        {
+          "nutrientName": "Whey Protein Isolate",
+          "amountPerServing": "25g",
+          "amount": "83%"
+        }
+      ],
+      "reviews": [
+        {
+          "username": "john_lifter",
+          "stars": 5,
+          "comment": "Great taste and mixes well!"
+        }
+      ],
+      "freebies": [
+        "Free Shaker",
+        "Free Shipping over $50"
+      ],
+        "Mix one scoop with 250ml of water",
+        "Drink immediately after workout"
+      ],
+      "faqs": [
+        {
+          "question": "Is this product suitable for vegans?",
+          "answer": "Yes, it is plant-based."
+        }
+      ]
     }
-  ],
-  "servingSize": "1 Scoop (30g)",
-  "capsulesPerContainer": "30 Scoops",
-  "supplementFacts": [
-    {
-      "nutrientName": "Whey Protein Isolate",
-      "amountPerServing": "25g",
-      "amount": "83%"
-    }
-  ],
-  "reviews": [
-    {
-      "username": "john_lifter",
-      "stars": 5,
-      "comment": "Great taste and mixes well!"
-    }
-  ],
-  "freebies": [
-    "Free Shaker",
-    "Free Shipping over $50"
-  ]
-}
+    ```
+2.  **`featuredImages`**: `List<File>` (Exactly 2 files)
+3.  **`singleProductImage`**: `File` (Optional)
+4.  **`twoProductImage`**: `File` (Optional)
+5.  **`threeProductImage`**: `File` (Optional)
+
+**Frontend Implementation Example (JavaScript):**
+```javascript
+const formData = new FormData();
+
+// 1. Add product data as a JSON blob
+const productBlob = new Blob([JSON.stringify(productData)], { type: 'application/json' });
+formData.append('product', productBlob);
+
+// 2. Add files
+featuredImagesArray.forEach(file => formData.append('featuredImages', file));
+formData.append('singleProductImage', fileInput1.files[0]);
+formData.append('twoProductImage', fileInput2.files[0]);
+formData.append('threeProductImage', fileInput3.files[0]);
+
+// 3. Send request
+fetch('/api/products', {
+  method: 'POST',
+  headers: { 'Authorization': 'Bearer ' + token },
+  body: formData // Content-Type is set automatically by the browser
+});
 ```
 
 **Success Response (201 Created):**
@@ -396,28 +419,13 @@ You can obtain a token by calling the **Login** or **Signup** endpoints.
     "name": "Supplements",
     "svg": "<svg>...</svg>"
   },
-  "description": "Premium whey protein isolate for lean muscle growth.",
-  "singleProductMp": 3500.0,
-  "singleProductSp": 2800.0,
-  "twoProductMp": 7000.0,
-  "twoProductSp": 5000.0,
-  "threeProductMp": 10500.0,
-  "threeProductSp": 7000.0,
-  "discount": 20.0,
   "featuredImages": [
-    "https://example.com/featured-1.jpg",
-    "https://example.com/featured-2.jpg",
-    "https://example.com/featured-3.jpg",
-    "https://example.com/featured-4.jpg",
-    "https://example.com/featured-5.jpg"
+    "data:image/png;base64,iVBORw0KGgoAAA...",
+    "data:image/png;base64,iVBORw0KGgoAAA..."
   ],
-  "singleProductImage": "https://example.com/single.jpg",
-  "twoProductImage": "https://example.com/two.jpg",
-  "threeProductImage": "https://example.com/three.jpg",
-  "images": [
-    "https://example.com/whey-front.jpg",
-    "https://example.com/whey-back.jpg"
-  ],
+  "singleProductImage": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==",
+  "twoProductImage": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==",
+  "threeProductImage": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==",
   "benefits": [
     {
       "svg": "<svg>...</svg>",
@@ -445,6 +453,15 @@ You can obtain a token by calling the **Login** or **Signup** endpoints.
   "freebies": [
     "Free Shaker",
     "Free Shipping over $50"
+  ],
+    "Mix one scoop with 250ml of water",
+    "Drink immediately after workout"
+  ],
+  "faqs": [
+    {
+      "question": "Is this product suitable for vegans?",
+      "answer": "Yes, it is plant-based."
+    }
   ]
 }
 ```
@@ -489,8 +506,9 @@ You can obtain a token by calling the **Login** or **Signup** endpoints.
 | **Method**  | `PUT`                  |
 | **URL**     | `/products/{id}`       |
 | **Auth**    | 🔒 ADMIN              |
+| **Content-Type** | `multipart/form-data` |
 
-**Request Body:** Updated `Product` object (same structure as create).
+**Request Parts:** Same structure as **Create Product (4.1)**. Include the `product` JSON and any new `MultipartFile` images to update. If an image part is not included, the existing image will be kept.
 
 **Success Response (200 OK):** Updated `Product` object.
 
@@ -613,9 +631,13 @@ You can obtain a token by calling the **Login** or **Signup** endpoints.
 | **URL**     | `/blogs`               |
 | **Auth**    | 🔒 ADMIN              |
 
-> A blog can be linked to one or more products via their IDs.
+> A blog can be linked to one or more products via their IDs. This endpoint consumes `multipart/form-data`.
 
-**Request Body:**
+**Request Parts:**
+1.  `blog`: A JSON blob containing the blog details (title, content, author, relatedProducts).
+2.  `image`: (Optional) The blog's feature image file.
+
+**JSON Part Example (`blog`):**
 ```json
 {
   "title": "Top 5 Supplements for Beginners",
@@ -684,6 +706,32 @@ You can obtain a token by calling the **Login** or **Signup** endpoints.
 
 ---
 
+### 6.4 Update Blog
+
+| Property    | Value                  |
+|-------------|------------------------|
+| **Method**  | `PUT`                  |
+| **URL**     | `/blogs/{id}`          |
+| **Auth**    | 🔒 ADMIN              |
+
+**Request Parts:** Same as **Create Blog (6.1)**.
+
+**Success Response (200 OK):** Updated `Blog` object.
+
+---
+
+### 6.5 Delete Blog
+
+| Property    | Value                  |
+|-------------|------------------------|
+| **Method**  | `DELETE`               |
+| **URL**     | `/blogs/{id}`          |
+| **Auth**    | 🔒 ADMIN              |
+
+**Success Response (204 No Content):** Empty body.
+
+---
+
 ---
 
 ## 7. Information Endpoints
@@ -696,9 +744,13 @@ You can obtain a token by calling the **Login** or **Signup** endpoints.
 | **URL**     | `/information`         |
 | **Auth**    | 🔒 ADMIN              |
 
-> Can optionally be linked to a category by providing the category ID.
+> Can optionally be linked to a category. This endpoint consumes `multipart/form-data`.
 
-**Request Body:**
+**Request Parts:**
+1.  `information`: A JSON blob containing the information details (title, content, category).
+2.  `image`: (Optional) A single image file for this information section.
+
+**JSON Part Example (`information`):**
 ```json
 {
   "title": "About Our Supplements",
@@ -706,14 +758,6 @@ You can obtain a token by calling the **Login** or **Signup** endpoints.
   "category": {
     "id": 1
   }
-}
-```
-
-**Request Body (without category):**
-```json
-{
-  "title": "Shipping Policy",
-  "content": "We offer free shipping on orders above Rs. 2000..."
 }
 ```
 
@@ -761,6 +805,32 @@ You can obtain a token by calling the **Login** or **Signup** endpoints.
   "error": "Information not found with ID 99"
 }
 ```
+
+---
+
+### 7.4 Update Information
+
+| Property    | Value                  |
+|-------------|------------------------|
+| **Method**  | `PUT`                  |
+| **URL**     | `/information/{id}`    |
+| **Auth**    | 🔒 ADMIN              |
+
+**Request Parts:** Same as **Create Information (7.1)**.
+
+**Success Response (200 OK):** Updated `Information` object.
+
+---
+
+### 7.5 Delete Information
+
+| Property    | Value                  |
+|-------------|------------------------|
+| **Method**  | `DELETE`               |
+| **URL**     | `/information/{id}`    |
+| **Auth**    | 🔒 ADMIN              |
+
+**Success Response (204 No Content):** Empty body.
 
 ---
 
@@ -860,8 +930,93 @@ All errors follow a consistent JSON format:
 | 22 | `POST`   | `/blogs`                                 | 🔒 ADMIN    | Create a blog post                       |
 | 23 | `GET`    | `/blogs`                                 | None         | Get all blog posts                       |
 | 24 | `GET`    | `/blogs/{id}`                            | None         | Get blog by ID                           |
-| 25 | `POST`   | `/information`                           | 🔒 ADMIN    | Create an information page               |
-| 26 | `GET`    | `/information`                           | None         | Get all information pages                |
-| 27 | `GET`    | `/information/{id}`                      | None         | Get information by ID                    |
-| 28 | `POST`   | `/analytics/record`                      | None         | Record a new visit based on IP           |
-| 29 | `GET`    | `/analytics/stats`                       | None         | Get analytics statistics                 |
+| 25 | `PUT`    | `/blogs/{id}`                            | 🔒 ADMIN    | Update a blog post                       |
+| 26 | `DELETE` | `/blogs/{id}`                            | 🔒 ADMIN    | Delete a blog post                       |
+| 27 | `POST`   | `/information`                           | 🔒 ADMIN    | Create an information page               |
+| 28 | `GET`    | `/information`                           | None         | Get all information pages                |
+| 29 | `GET`    | `/information/{id}`                      | None         | Get information by ID                    |
+| 30 | `PUT`    | `/information/{id}`                      | 🔒 ADMIN    | Update an information page               |
+| 31 | `DELETE` | `/information/{id}`                      | 🔒 ADMIN    | Delete an information page               |
+| 32 | `POST`   | `/analytics/record`                      | None         | Record a new visit based on IP           |
+| 33 | `GET`    | `/analytics/stats`                       | None         | Get analytics statistics                 |
+---
+
+---
+
+## 9. Working with Images (Frontend Guide)
+
+### 9.1 Uploading Images (Multipart/Form-Data)
+When creating or updating a product, images must be sent as binary files using the `FormData` browser API. Do **not** send raw JSON for these endpoints.
+
+**Steps:**
+1.  Construct a `FormData` object.
+2.  Attach the product JSON as a `Blob` with type `application/json`.
+3.  Attach individual or lists of files.
+
+```javascript
+const formData = new FormData();
+
+// Build the product data object (excluding images)
+const productData = {
+  name: "My Product",
+  description: "Description here...",
+  // ... rest of product fields
+};
+
+// Convert JSON data to a Blob so the backend identifies it as JSON
+const jsonBlob = new Blob([JSON.stringify(productData)], { type: 'application/json' });
+formData.append('product', jsonBlob);
+
+// Append files (from <input type="file"> or state)
+formData.append('singleProductImage', selectedFile1);
+formData.append('twoProductImage', selectedFile2);
+
+// Append multiple files for featuredImages (exactly 2 required)
+featuredFilesArray.forEach(file => {
+  formData.append('featuredImages', file);
+});
+
+// Send via fetch/axios
+const response = await fetch('/api/products', {
+  method: 'POST',
+  headers: {
+    // DO NOT set Content-Type header manually, 
+    // the browser will set it to multipart/form-data with a boundary
+    'Authorization': `Bearer ${token}`
+  },
+  body: formData
+});
+```
+
+### 9.2 Displaying Images (Fetching)
+The backend uses a custom serializer that automatically adds the `data:image/png;base64,` prefix to all byte-array fields. 
+
+**This means you can use the response strings directly in your `src` attribute.**
+
+```javascript
+// Example: Displaying a product from a GET request
+const product = {
+  name: "Whey Protein",
+  singleProductImage: "data:image/png;base64,iVBORw0KGgoAAA..." // Backend sends this
+};
+
+// In your React Component
+return (
+  <div>
+    <h1>{product.name}</h1>
+    
+    {/* Use the string directly! No conversion needed. */}
+    <img src={product.singleProductImage} alt="Main" />
+
+    {/* Displaying featured images list */}
+    {product.featuredImages.map((src, index) => (
+      <img key={index} src={src} alt={`Featured ${index}`} />
+    ))}
+  </div>
+);
+```
+
+**Key Advantages:**
+*   **Plug-and-play**: No need to `atob` or prepend prefixes in your frontend code.
+*   **Security**: Stored as binary in the DB, served as safe Data URLs.
+*   **Size**: We've increased server limits (10MB per file) so high-res images are supported.

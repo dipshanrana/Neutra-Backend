@@ -1,5 +1,7 @@
 package com.example.nutra.model;
 
+import com.example.nutra.config.Base64ImageSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,6 +21,11 @@ public class Information {
 
     @Column(columnDefinition = "TEXT")
     private String content;
+
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    @JsonSerialize(using = Base64ImageSerializer.class)
+    private byte[] image;
 
     // As requested: information model which will be linked to all categories
     // Rather than mapping a many-to-many back to Category, usually an informational

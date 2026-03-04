@@ -1,5 +1,7 @@
 package com.example.nutra.model;
 
+import com.example.nutra.config.Base64ImageSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;
@@ -22,6 +24,11 @@ public class Blog {
     private String content;
 
     private String author;
+
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    @JsonSerialize(using = Base64ImageSerializer.class)
+    private byte[] image;
 
     // A blog can be related to single or multiple products
     @ManyToMany

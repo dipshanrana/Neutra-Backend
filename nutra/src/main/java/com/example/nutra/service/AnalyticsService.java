@@ -1,6 +1,6 @@
 package com.example.nutra.service;
 
-import com.example.nutra.model.Visit;
+import com.example.nutra.model.AnalyticsVisit;
 import com.example.nutra.repository.VisitRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +23,7 @@ public class AnalyticsService {
         try {
             if (ipAddress != null && !ipAddress.equals("0:0:0:0:0:0:0:1") && !ipAddress.equals("127.0.0.1")) {
                 String url = "http://ip-api.com/json/" + ipAddress;
+                @SuppressWarnings("unchecked")
                 Map<String, Object> response = restTemplate.getForObject(url, Map.class);
                 if (response != null && "success".equals(response.get("status"))) {
                     country = (String) response.get("country");
@@ -34,7 +35,7 @@ public class AnalyticsService {
             System.err.println("Failed to get country for IP: " + ipAddress);
         }
 
-        Visit visit = Visit.builder()
+        AnalyticsVisit visit = AnalyticsVisit.builder()
                 .ipAddress(ipAddress)
                 .country(country)
                 .visitedAt(LocalDateTime.now())

@@ -1,0 +1,175 @@
+﻿mmediately after workout"
+  ]
+}
+```
+
+---
+
+### 4.2 Get All Products
+
+| Property    | Value                  |
+|-------------|------------------------|
+| **Method**  | `GET`                  |
+| **URL**     | `/products`            |
+| **Auth**    | None (Public)          |
+
+**Success Response (200 OK):** `List<Product>`
+
+---
+
+### 4.3 Get Product by ID
+
+| Property    | Value                  |
+|-------------|------------------------|
+| **Method**  | `GET`                  |
+| **URL**     | `/products/{id}`       |
+| **Auth**    | None (Public)          |
+
+**Success Response (200 OK):** Full `Product` object (as shown in 4.1 response).
+
+**Error Response (404):**
+```json
+{
+  "error": "Product not found with id: 99"
+}
+```
+
+---
+
+### 4.4 Update Product
+
+| Property    | Value                  |
+|-------------|------------------------|
+| **Method**  | `PUT`                  |
+| **URL**     | `/products/{id}`       |
+| **Auth**    | 🔒 ADMIN              |
+
+**Request Body:** Updated `Product` object (same structure as create).
+
+**Success Response (200 OK):** Updated `Product` object.
+
+---
+
+### 4.5 Delete Product
+
+| Property    | Value                  |
+|-------------|------------------------|
+| **Method**  | `DELETE`               |
+| **URL**     | `/products/{id}`       |
+| **Auth**    | 🔒 ADMIN              |
+
+**Success Response (204 No Content):** Empty body.
+
+---
+
+### 4.6 Get All Category Names
+
+| Property    | Value                       |
+|-------------|------------------------------|
+| **Method**  | `GET`                        |
+| **URL**     | `/products/categories`       |
+| **Auth**    | None (Public)                |
+
+> Returns only the names. For full category objects, use `GET /categories`.
+
+**Success Response (200 OK):**
+```json
+["Supplements", "Vitamins", "Equipment"]
+```
+
+---
+
+### 4.7 Get Sample Products from 3 Random Categories
+
+| Property    | Value                                    |
+|-------------|------------------------------------------|
+| **Method**  | `GET`                                    |
+| **URL**     | `/products/categories/sample-products`   |
+| **Auth**    | None (Public)                            |
+
+> Returns one product from each of up to 3 randomly selected categories. Useful for homepage previews.
+
+**Success Response (200 OK):** `List<Product>` (max 3 items)
+
+---
+
+### 4.8 Get All Products (Random Order)
+
+| Property    | Value                  |
+|-------------|------------------------|
+| **Method**  | `GET`                  |
+| **URL**     | `/products/random`     |
+| **Auth**    | None (Public)          |
+
+**Success Response (200 OK):** `List<Product>` in shuffled order.
+
+---
+
+---
+
+## 5. Product Search Endpoints
+
+### 5.1 Search by Category Name
+
+| Property        | Value                                          |
+|-----------------|------------------------------------------------|
+| **Method**      | `GET`                                          |
+| **URL**         | `/products/search/category?category={name}`    |
+| **Auth**        | None (Public)                                  |
+| **Query Param** | `category` — category name (case-insensitive)  |
+
+**Example:** `GET /products/search/category?category=Supplements`
+
+**Success Response (200 OK):** `List<Product>`
+
+---
+
+### 5.2 Search by Product Name
+
+| Property        | Value                                          |
+|-----------------|------------------------------------------------|
+| **Method**      | `GET`                                          |
+| **URL**         | `/products/search/name?name={searchTerm}`      |
+| **Auth**        | None (Public)                                  |
+| **Query Param** | `name` — partial name match (case-insensitive) |
+
+**Example:** `GET /products/search/name?name=whey`
+
+**Success Response (200 OK):** `List<Product>`
+
+---
+
+### 5.3 Search by Price Range
+
+| Property         | Value                                            |
+|------------------|--------------------------------------------------|
+| **Method**       | `GET`                                            |
+| **URL**          | `/products/search/price?min={min}&max={max}`     |
+| **Auth**         | None (Public)                                    |
+| **Query Params** | `min` — minimum selling price (Double)           |
+|                  | `max` — maximum selling price (Double)           |
+
+**Example:** `GET /products/search/price?min=1000&max=3000`
+
+**Success Response (200 OK):** `List<Product>`
+
+---
+
+---
+
+## 6. Blog Endpoints
+
+### 6.1 Create Blog
+
+| Property    | Value                  |
+|-------------|------------------------|
+| **Method**  | `POST`                 |
+| **URL**     | `/blogs`               |
+| **Auth**    | 🔒 ADMIN              |
+
+> A blog can be linked to one or more products via their IDs.
+
+**Request Body:**
+```json
+{
+  "title": "Top 5 

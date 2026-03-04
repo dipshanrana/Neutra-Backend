@@ -1,5 +1,9 @@
 package com.example.nutra.model;
 
+import com.example.nutra.config.Base64ImageDeserializer;
+import com.example.nutra.config.Base64ImageSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -38,23 +42,30 @@ public class Product {
     private Double discount;
 
     @ElementCollection
-    @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id"))
-    @Column(name = "image_url", columnDefinition = "LONGTEXT")
-    private List<String> images;
-
-    @ElementCollection
     @CollectionTable(name = "product_featured_images", joinColumns = @JoinColumn(name = "product_id"))
-    @Column(name = "feature_image_url", columnDefinition = "LONGTEXT")
-    private List<String> featuredImages;
+    @Lob
+    @Column(name = "feature_image_data", columnDefinition = "LONGBLOB")
+    @JsonDeserialize(contentUsing = Base64ImageDeserializer.class)
+    @JsonSerialize(contentUsing = Base64ImageSerializer.class)
+    private List<byte[]> featuredImages;
 
-    @Column(columnDefinition = "LONGTEXT")
-    private String singleProductImage;
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    @JsonDeserialize(using = Base64ImageDeserializer.class)
+    @JsonSerialize(using = Base64ImageSerializer.class)
+    private byte[] singleProductImage;
 
-    @Column(columnDefinition = "LONGTEXT")
-    private String twoProductImage;
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    @JsonDeserialize(using = Base64ImageDeserializer.class)
+    @JsonSerialize(using = Base64ImageSerializer.class)
+    private byte[] twoProductImage;
 
-    @Column(columnDefinition = "LONGTEXT")
-    private String threeProductImage;
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    @JsonDeserialize(using = Base64ImageDeserializer.class)
+    @JsonSerialize(using = Base64ImageSerializer.class)
+    private byte[] threeProductImage;
 
     @ElementCollection
     @CollectionTable(name = "product_benefits", joinColumns = @JoinColumn(name = "product_id"))
@@ -73,8 +84,17 @@ public class Product {
 
     @ElementCollection
     @CollectionTable(name = "product_freebies", joinColumns = @JoinColumn(name = "product_id"))
-    @Column(name = "freebie")
+    @Column(name = "freebie", columnDefinition = "TEXT")
     private List<String> freebies;
+
+    @ElementCollection
+    @CollectionTable(name = "product_how_to_use", joinColumns = @JoinColumn(name = "product_id"))
+    @Column(name = "step", columnDefinition = "TEXT")
+    private List<String> howToUse;
+
+    @ElementCollection
+    @CollectionTable(name = "product_faqs", joinColumns = @JoinColumn(name = "product_id"))
+    private List<FAQ> faqs;
 
     public void addReview(Review review) {
         if (reviews == null) {

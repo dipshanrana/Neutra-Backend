@@ -4,9 +4,12 @@ import com.example.nutra.model.Product;
 import com.example.nutra.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -17,9 +20,16 @@ public class ProductController {
 
     private final ProductService productService;
 
-    @PostMapping
-    public ResponseEntity<Product> addProduct(@RequestBody Product product) {
-        Product savedProduct = productService.addProduct(product);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Product> addProduct(
+            @RequestPart("product") Product product,
+            @RequestPart(value = "featuredImages", required = false) List<MultipartFile> featuredImages,
+            @RequestPart(value = "singleProductImage", required = false) MultipartFile singleProductImage,
+            @RequestPart(value = "twoProductImage", required = false) MultipartFile twoProductImage,
+            @RequestPart(value = "threeProductImage", required = false) MultipartFile threeProductImage)
+            throws IOException {
+        Product savedProduct = productService.addProduct(product, featuredImages, singleProductImage, twoProductImage,
+                threeProductImage);
         return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
     }
 
@@ -63,9 +73,17 @@ public class ProductController {
         return ResponseEntity.ok(productService.getProductById(id));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product product) {
-        return ResponseEntity.ok(productService.updateProduct(id, product));
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Product> updateProduct(
+            @PathVariable Long id,
+            @RequestPart("product") Product product,
+            @RequestPart(value = "featuredImages", required = false) List<MultipartFile> featuredImages,
+            @RequestPart(value = "singleProductImage", required = false) MultipartFile singleProductImage,
+            @RequestPart(value = "twoProductImage", required = false) MultipartFile twoProductImage,
+            @RequestPart(value = "threeProductImage", required = false) MultipartFile threeProductImage)
+            throws IOException {
+        return ResponseEntity.ok(productService.updateProduct(id, product, featuredImages, singleProductImage,
+                twoProductImage, threeProductImage));
     }
 
     @DeleteMapping("/{id}")

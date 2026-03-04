@@ -9,7 +9,10 @@ import com.example.nutra.repository.CategoryRepository;
 import com.example.nutra.Exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -22,7 +25,8 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
 
-    public Product addProduct(Product product) {
+    public Product addProduct(Product product, List<MultipartFile> featuredImages, MultipartFile singleProductImage,
+            MultipartFile twoProductImage, MultipartFile threeProductImage) throws IOException {
         if (product.getCategory() != null) {
             Category cat = categoryRepository.findByNameIgnoreCase(product.getCategory().getName());
             if (cat == null) {
@@ -35,8 +39,27 @@ public class ProductService {
                 r.setProduct(product);
             }
         }
-        if (product.getFeaturedImages() != null && product.getFeaturedImages().size() != 5) {
-            throw new IllegalArgumentException("There must be exactly 5 featured images.");
+
+        if (featuredImages != null && !featuredImages.isEmpty()) {
+            List<byte[]> imageBytesList = new ArrayList<>();
+            for (MultipartFile file : featuredImages) {
+                imageBytesList.add(convertToBytes(file));
+            }
+            product.setFeaturedImages(imageBytesList);
+        }
+
+        if (singleProductImage != null && !singleProductImage.isEmpty()) {
+            product.setSingleProductImage(convertToBytes(singleProductImage));
+        }
+        if (twoProductImage != null && !twoProductImage.isEmpty()) {
+            product.setTwoProductImage(convertToBytes(twoProductImage));
+        }
+        if (threeProductImage != null && !threeProductImage.isEmpty()) {
+            product.setThreeProductImage(convertToBytes(threeProductImage));
+        }
+
+        if (product.getFeaturedImages() != null && product.getFeaturedImages().size() != 2) {
+            throw new IllegalArgumentException("There must be exactly 2 featured images.");
         }
         return productRepository.save(product);
     }
@@ -80,7 +103,9 @@ public class ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
     }
 
-    public Product updateProduct(Long id, Product productDetails) {
+    public Product updateProduct(Long id, Product productDetails, List<MultipartFile> featuredImages,
+            MultipartFile singleProductImage, MultipartFile twoProductImage, MultipartFile threeProductImage)
+            throws IOException {
         Product existingProduct = getProductById(id);
         existingProduct.setName(productDetails.getName());
         existingProduct.setLink(productDetails.getLink());
@@ -105,21 +130,36 @@ public class ProductService {
         existingProduct.setThreeProductSp(productDetails.getThreeProductSp());
 
         existingProduct.setDiscount(productDetails.getDiscount());
-        existingProduct.setImages(productDetails.getImages());
         existingProduct.setBenefits(productDetails.getBenefits());
 
-        if (productDetails.getFeaturedImages() != null && productDetails.getFeaturedImages().size() != 5) {
-            throw new IllegalArgumentException("There must be exactly 5 featured images.");
+        if (featuredImages != null && !featuredImages.isEmpty()) {
+            List<byte[]> imageBytesList = new ArrayList<>();
+            for (MultipartFile file : featuredImages) {
+                imageBytesList.add(convertToBytes(file));
+            }
+            existingProduct.setFeaturedImages(imageBytesList);
         }
-        existingProduct.setFeaturedImages(productDetails.getFeaturedImages());
-        existingProduct.setSingleProductImage(productDetails.getSingleProductImage());
-        existingProduct.setTwoProductImage(productDetails.getTwoProductImage());
-        existingProduct.setThreeProductImage(productDetails.getThreeProductImage());
+
+        if (singleProductImage != null && !singleProductImage.isEmpty()) {
+            existingProduct.setSingleProductImage(convertToBytes(singleProductImage));
+        }
+        if (twoProductImage != null && !twoProductImage.isEmpty()) {
+            existingProduct.setTwoProductImage(convertToBytes(twoProductImage));
+        }
+        if (threeProductImage != null && !threeProductImage.isEmpty()) {
+            existingProduct.setThreeProductImage(convertToBytes(threeProductImage));
+        }
+
+        if (existingProduct.getFeaturedImages() != null && existingProduct.getFeaturedImages().size() != 2) {
+            throw new IllegalArgumentException("There must be exactly 2 featured images.");
+        }
 
         existingProduct.setServingSize(productDetails.getServingSize());
         existingProduct.setCapsulesPerContainer(productDetails.getCapsulesPerContainer());
         existingProduct.setSupplementFacts(productDetails.getSupplementFacts());
         existingProduct.setFreebies(productDetails.getFreebies());
+        existingProduct.setHowToUse(productDetails.getHowToUse());
+        existingProduct.setFaqs(productDetails.getFaqs());
 
         if (productDetails.getReviews() != null) {
             if (existingProduct.getReviews() == null) {
@@ -137,6 +177,13 @@ public class ProductService {
             }
         }
         return productRepository.save(existingProduct);
+    }
+
+    private byte[] convertToBytes(MultipartFile file) throws IOException {
+        if (file == null || file.isEmpty()) {
+            return null;
+        }
+        return file.getBytes();
     }
 
     public void deleteProduct(Long id) {
