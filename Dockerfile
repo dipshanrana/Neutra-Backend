@@ -1,11 +1,11 @@
 # Build stage
 FROM maven:3.9.6-eclipse-temurin-21-jammy AS build
 WORKDIR /app
-COPY pom.xml .
-COPY .mvn .mvn
-COPY mvnw .
-COPY mvnw.cmd .
-COPY src src
+COPY nutra/pom.xml .
+COPY nutra/.mvn .mvn
+COPY nutra/mvnw .
+COPY nutra/mvnw.cmd .
+COPY nutra/src src
 RUN mvn clean package -DskipTests
 
 # Run stage
