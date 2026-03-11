@@ -24,6 +24,7 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final FileStorageService fileStorageService;
 
     public Product addProduct(Product product, List<MultipartFile> featuredImages, MultipartFile singleProductImage,
             MultipartFile twoProductImage, MultipartFile threeProductImage) throws IOException {
@@ -41,21 +42,21 @@ public class ProductService {
         }
 
         if (featuredImages != null && !featuredImages.isEmpty()) {
-            List<byte[]> imageBytesList = new ArrayList<>();
+            List<String> imagePaths = new ArrayList<>();
             for (MultipartFile file : featuredImages) {
-                imageBytesList.add(convertToBytes(file));
+                imagePaths.add(fileStorageService.storeFile(file));
             }
-            product.setFeaturedImages(imageBytesList);
+            product.setFeaturedImages(imagePaths);
         }
 
         if (singleProductImage != null && !singleProductImage.isEmpty()) {
-            product.setSingleProductImage(convertToBytes(singleProductImage));
+            product.setSingleProductImage(fileStorageService.storeFile(singleProductImage));
         }
         if (twoProductImage != null && !twoProductImage.isEmpty()) {
-            product.setTwoProductImage(convertToBytes(twoProductImage));
+            product.setTwoProductImage(fileStorageService.storeFile(twoProductImage));
         }
         if (threeProductImage != null && !threeProductImage.isEmpty()) {
-            product.setThreeProductImage(convertToBytes(threeProductImage));
+            product.setThreeProductImage(fileStorageService.storeFile(threeProductImage));
         }
 
         if (product.getFeaturedImages() != null && product.getFeaturedImages().size() != 2) {
@@ -134,21 +135,28 @@ public class ProductService {
         existingProduct.setBenefits(productDetails.getBenefits());
 
         if (featuredImages != null && !featuredImages.isEmpty()) {
-            List<byte[]> imageBytesList = new ArrayList<>();
-            for (MultipartFile file : featuredImages) {
-                imageBytesList.add(convertToBytes(file));
+            // Delete old files
+            if (existingProduct.getFeaturedImages() != null) {
+                existingProduct.getFeaturedImages().forEach(fileStorageService::deleteFile);
             }
-            existingProduct.setFeaturedImages(imageBytesList);
+            List<String> imagePaths = new ArrayList<>();
+            for (MultipartFile file : featuredImages) {
+                imagePaths.add(fileStorageService.storeFile(file));
+            }
+            existingProduct.setFeaturedImages(imagePaths);
         }
 
         if (singleProductImage != null && !singleProductImage.isEmpty()) {
-            existingProduct.setSingleProductImage(convertToBytes(singleProductImage));
+            fileStorageService.deleteFile(existingProduct.getSingleProductImage());
+            existingProduct.setSingleProductImage(fileStorageService.storeFile(singleProductImage));
         }
         if (twoProductImage != null && !twoProductImage.isEmpty()) {
-            existingProduct.setTwoProductImage(convertToBytes(twoProductImage));
+            fileStorageService.deleteFile(existingProduct.getTwoProductImage());
+            existingProduct.setTwoProductImage(fileStorageService.storeFile(twoProductImage));
         }
         if (threeProductImage != null && !threeProductImage.isEmpty()) {
-            existingProduct.setThreeProductImage(convertToBytes(threeProductImage));
+            fileStorageService.deleteFile(existingProduct.getThreeProductImage());
+            existingProduct.setThreeProductImage(fileStorageService.storeFile(threeProductImage));
         }
 
         if (existingProduct.getFeaturedImages() != null && existingProduct.getFeaturedImages().size() != 2) {
@@ -180,14 +188,12 @@ public class ProductService {
         return productRepository.save(existingProduct);
     }
 
-    private byte[] convertToBytes(MultipartFile file) throws IOException {
-        if (file == null || file.isEmpty()) {
-            return null;
-        }
-        return file.getBytes();
-    }
-
     public void deleteProduct(Long id) {
+        Product p = getProductById(id);
+        if (p.getFeaturedImages() != null) p.getFeaturedImages().forEach(fileStorageService::deleteFile);
+        fileStorageService.deleteFile(p.getSingleProductImage());
+        fileStorageService.deleteFile(p.getTwoProductImage());
+        fileStorageService.deleteFile(p.getThreeProductImage());
         productRepository.deleteById(id);
     }
 }

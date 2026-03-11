@@ -15,10 +15,11 @@ import java.io.IOException;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final FileStorageService fileStorageService;
 
-    public Category addCategory(Category category, MultipartFile imageFile) throws IOException {
-        if (imageFile != null && !imageFile.isEmpty()) {
-            category.setImage(imageFile.getBytes());
+    public Category addCategory(Category category, MultipartFile image) throws IOException {
+        if (image != null && !image.isEmpty()) {
+            category.setImage(fileStorageService.storeFile(image));
         }
         return categoryRepository.save(category);
     }
@@ -32,19 +33,29 @@ public class CategoryService {
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
     }
 
-    public Category updateCategory(Long id, Category category, MultipartFile imageFile) throws IOException {
-        Category existing = getCategoryById(id);
-        existing.setName(category.getName());
-        existing.setSvg(category.getSvg());
-        existing.setBadge(category.getBadge());
-        existing.setShortDescription(category.getShortDescription());
-        if (imageFile != null && !imageFile.isEmpty()) {
-            existing.setImage(imageFile.getBytes());
+    public Category updateCategory(Long id, Category categoryDetails, MultipartFile image) throws IOException {
+        Category category = getCategoryById(id);
+        category.setName(categoryDetails.getName());
+        category.setSvg(categoryDetails.getSvg());
+        category.setBadge(categoryDetails.getBadge());
+        category.setShortDescription(categoryDetails.getShortDescription());
+
+        if (image != null && !image.isEmpty()) {
+            // Delete old image if it exists
+            if (category.getImage() != null && !category.getImage().isEmpty()) {
+                fileStorageService.deleteFile(category.getImage());
+            }
+            category.setImage(fileStorageService.storeFile(image));
         }
-        return categoryRepository.save(existing);
+        return categoryRepository.save(category);
     }
 
     public void deleteCategory(Long id) {
+        Category category = getCategoryById(id);
+        // Delete associated image file
+        if (category.getImage() != null && !category.getImage().isEmpty()) {
+            fileStorageService.deleteFile(category.getImage());
+        }
         categoryRepository.deleteById(id);
     }
 }

@@ -8,14 +8,24 @@
 
                 ---
 
-                ## 🔑 Default Admin Credentials
+                ## 🔑 Auto-Seeded Data
 
-                A static admin account is auto-seeded on first startup:
+A default dataset is created on first startup if the database is empty:
 
-                | Field    | Value            |
-                |----------|------------------|
-                | Username | `admin@admin.com`|
-                | Password | `admin123`       |
+### 1. Admin Credentials
+| Field    | Value            | Role  |
+|----------|------------------|-------|
+| Username | `admin@admin.com`| ADMIN |
+| Password | `admin123`       |       |
+
+### 2. Test Customer Accounts
+Ten accounts are seeded from `user1@example.com` to `user10@example.com` with the password `password123`.
+
+### 3. Store Content
+The seeder also creates:
+*   **5 Categories**: Supplements, Vitamins, Lifestyle, Equipment, Bundles.
+*   **10 Products**: Samples spread across categories with mock images.
+*   **3 Blogs** & **3 Information Pages**.
 
                 ---
 
@@ -84,7 +94,7 @@
                 **Request Body:**
                 ```json
                 {
-                  "username": "johndoe",
+                  "username": "user1@example.com",
                   "password": "password123"
                 }
                 ```
@@ -93,7 +103,7 @@
                 ```json
                 {
                   "userId": "2",
-                  "username": "johndoe",
+                  "username": "user1@example.com",
                   "JwtToken": "eyJhbGciOiJIUzI1NiJ9..."
                 }
                 ```
@@ -267,7 +277,9 @@
                   "id": 1,
                   "name": "Supplements",
                   "svg": "<svg>...</svg>",
-                  "image": "data:image/png;base64,..."
+                  "badge": "NEW",
+                  "shortDescription": "High-quality supplement category",
+                  "image": "/uploads/supplements.png"
                 }
                 ```
 
@@ -450,7 +462,7 @@
                 formData.append('threeProductImage', fileInput3.files[0]);
 
                 // 3. Send request
-                fetch('/products', {
+                fetch('http://209.126.86.149:8079/products', {
                   method: 'POST',
                   headers: { 'Authorization': 'Bearer ' + token },
                   body: formData // Content-Type is set automatically by the browser
@@ -469,12 +481,12 @@
                     "svg": "<svg>...</svg>"
                   },
                   "featuredImages": [
-                    "data:image/png;base64,iVBORw0KGgoAAA...",
-                    "data:image/png;base64,iVBORw0KGgoAAA..."
+                    "/uploads/featured1.png",
+                    "/uploads/featured2.png"
                   ],
-                  "singleProductImage": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==",
-                  "twoProductImage": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==",
-                  "threeProductImage": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==",
+                  "singleProductImage": "/uploads/single.png",
+                  "twoProductImage": "/uploads/two.png",
+                  "threeProductImage": "/uploads/three.png",
                   "benefitsParagraph": "Our premium whey protein isolate is designed for athletes who demand the best...",
                   "benefits": [
                     {
@@ -711,19 +723,8 @@
                   "title": "Top 5 Supplements for Beginners",
                   "content": "Here are the top supplements every beginner should consider...",
                   "author": "Admin",
-                  "relatedProducts": [
-                    {
-                      "id": 1,
-                      "name": "Whey Protein Isolate",
-                      "category": { "id": 1, "name": "Supplements", "svg": "..." },
-                      "description": "...",
-                      "mp": 3500.0,
-                      "sp": 2800.0,
-                      "discount": 20.0,
-                      "images": ["..."],
-                      "benefits": ["..."]
-                    }
-                  ]
+                  "image": "/uploads/blog1.png",
+                  "relatedProducts": [ ... ]
                 }
                 ```
 
@@ -821,6 +822,7 @@
                   "id": 1,
                   "title": "About Our Supplements",
                   "content": "We source our supplements from the finest manufacturers worldwide...",
+                  "image": "/uploads/info1.png",
                   "category": {
                     "id": 1,
                     "name": "Supplements",
@@ -1092,83 +1094,98 @@
 
                 ### 12. Working with Images (Frontend Guide)
 
-#### 🚀 Performance Warning: Use Binary Multipart Uploads
-Do **not** send image data as Base64 strings inside the JSON payload. This causes massive request sizes and slow processing.
-
-**The backend is optimized to ignore image fields in JSON.** Instead, always use the `MultipartFile` parts (binary) which are significantly faster and more reliable for large files.
+#### 🚀 How it Works
+1.  **Upload**: Send images as binary `MultipartFile` in your `POST`/`PUT` requests.
+2.  **Storage**: The server saves the file to disk and stores a relative path (e.g., `/uploads/uuid_filename.png`) in the database.
+3.  **Display**: The server serves these files as static resources. You can directly use the returned URL in an `<img>` tag:
+    `<img src="http://209.126.86.149:8079/uploads/xxxx.png" />`
 
 #### 9.1 Uploading Images (Multipart/Form-Data)
-When creating or updating a product, images must be sent as binary files using the `FormData` browser API. 
+When creating or updating a product, images must be sent as binary files using the `FormData` browser API.
 
 **Steps:**
 1.  Construct a `FormData` object.
 2.  Attach the product JSON as a `Blob` with type `application/json` (exclude image fields).
-3.  Attach individual or lists of files as binary parts.
+3.  Attach individual files for `singleProductImage`, `twoProductImage`, etc.
+4.  Attach multiple files for `featuredImages` parts.
 
-                ```javascript
-                const formData = new FormData();
+```javascript
+const formData = new FormData();
+const token = "YOUR_JWT_TOKEN";
 
-                // Build the product data object (excluding images)
-                const productData = {
-                  name: "My Product",
-                  description: "Description here...",
-                  // ... rest of product fields
-                };
+// 1. Build the product data (text fields only)
+const productData = { 
+  name: "New Vitamin", 
+  category: { name: "Vitamins" },
+  description: "High quality vitamins...",
+  singleProductMp: 50.0,
+  singleProductSp: 45.0,
+  // ... rest of the product fields
+};
 
-                // Convert JSON data to a Blob so the backend identifies it as JSON
-                const jsonBlob = new Blob([JSON.stringify(productData)], { type: 'application/json' });
-                formData.append('product', jsonBlob);
+// 2. Append JSON as a Blob
+formData.append('product', new Blob([JSON.stringify(productData)], { type: 'application/json' }));
 
-                // Append files (from <input type="file"> or state)
-                formData.append('singleProductImage', selectedFile1);
-                formData.append('twoProductImage', selectedFile2);
+// 3. Append individual image files
+formData.append('singleProductImage', fileInput1.files[0]); 
+formData.append('twoProductImage', fileInput2.files[0]);
+formData.append('threeProductImage', fileInput3.files[0]);
 
-                // Append multiple files for featuredImages (exactly 2 required)
-                featuredFilesArray.forEach(file => {
-                  formData.append('featuredImages', file);
-                });
+// 4. Append multiple files for featuredImages (exactly 2 required)
+formData.append('featuredImages', featuredInput.files[0]);
+formData.append('featuredImages', featuredInput.files[1]);
 
-                // Send via fetch/axios
-                const response = await fetch('/api/products', {
-                  method: 'POST',
-                  headers: {
-                    // DO NOT set Content-Type header manually, 
-                    // the browser will set it to multipart/form-data with a boundary
-                    'Authorization': `Bearer ${token}`
-                  },
-                  body: formData
-                });
+// 5. Send via fetch/axios (Note: NO /api prefix)
+const response = await fetch('http://209.126.86.149:8079/products', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${token}`
+    // Browser automatically sets Content-Type for FormData
+  },
+  body: formData
+});
+```
                 ```
 
                 ### 9.2 Displaying Images (Fetching)
-                The backend uses a custom serializer that automatically adds the `data:image/png;base64,` prefix to all byte-array fields. 
+The backend now returns simple relative URL strings for all image fields. These files are served as static resources from the `/uploads/` directory on the server.
 
-                **This means you can use the response strings directly in your `src` attribute.**
+**Example Response:**
+```json
+{
+  "name": "Whey Protein",
+  "singleProductImage": "/uploads/a1b2-c3d4-e5f6-image.png",
+  "featuredImages": [
+    "/uploads/f7g8-h9i0-image.png",
+    "/uploads/j1k2-l3m4-image.png"
+  ]
+}
+```
 
-                ```javascript
-                // Example: Displaying a product from a GET request
-                const product = {
-                  name: "Whey Protein",
-                  singleProductImage: "data:image/png;base64,iVBORw0KGgoAAA..." // Backend sends this
-                };
+**In your React/Frontend Component:**
+```javascript
+// Prepend the Base URL to the relative path
+const BASE_URL = "http://209.126.86.149:8079";
 
-                // In your React Component
-                return (
-                  <div>
-                    <h1>{product.name}</h1>
-                    
-                    {/* Use the string directly! No conversion needed. */}
-                    <img src={product.singleProductImage} alt="Main" />
+return (
+  <div>
+    <h1>{product.name}</h1>
+    
+    {/* Use the URL directly with the base URL! */}
+    <img src={`${BASE_URL}${product.singleProductImage}`} alt="Main" />
 
-                    {/* Displaying featured images list */}
-                    {product.featuredImages.map((src, index) => (
-                      <img key={index} src={src} alt={`Featured ${index}`} />
-                    ))}
-                  </div>
-                );
-                ```
+    {/* Displaying featured images list */}
+    {product.featuredImages.map((src, index) => (
+      <img key={index} src={`${BASE_URL}${src}`} alt={`Featured ${index}`} />
+    ))}
+  </div>
+);
+```
 
-                **Key Advantages:**
-                *   **Plug-and-play**: No need to `atob` or prepend prefixes in your frontend code.
-                *   **Security**: Stored as binary in the DB, served as safe Data URLs.
-                *   **Size**: We've increased server limits (10MB per file) so high-res images are supported.
+**🚀 Key Performance Advantages:**
+*   **Browser Caching**: Images are now cached by the browser, reducing repeated data transfer.
+*   **Smaller Payloads**: JSON responses are tiny because they only contain path strings.
+*   **Scalability**: The database stays small and fast since images are stored on the filesystem.
+*   **Zero Prefixes**: No Base64 data URLs - just clean static file serving.
+*   **Automatic Cleanup**: Deleting an entity (Product/Category/Blog) also automatically deletes its images from the disk.
+

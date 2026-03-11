@@ -1,10 +1,5 @@
 package com.example.nutra.model;
 
-import com.example.nutra.config.Base64ImageDeserializer;
-import com.example.nutra.config.Base64ImageSerializer;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -45,30 +40,17 @@ public class Product {
 
     @ElementCollection
     @CollectionTable(name = "product_featured_images", joinColumns = @JoinColumn(name = "product_id"))
-    @Lob
-    @Column(name = "feature_image_data", columnDefinition = "LONGBLOB")
-    @JsonSerialize(using = Base64ImageSerializer.class)
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private List<byte[]> featuredImages;
+    @Column(name = "feature_image_url")
+    private List<String> featuredImages;
 
-    @Lob
-    @Column(columnDefinition = "LONGBLOB")
-    @JsonSerialize(using = Base64ImageSerializer.class)
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private byte[] singleProductImage;
+    @Column(columnDefinition = "TEXT")
+    private String singleProductImage;
 
-    @Lob
-    @Column(columnDefinition = "LONGBLOB")
-    @JsonSerialize(using = Base64ImageSerializer.class)
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private byte[] twoProductImage;
+    @Column(columnDefinition = "TEXT")
+    private String twoProductImage;
 
-    @Lob
-    @Column(columnDefinition = "LONGBLOB")
-    @JsonDeserialize(using = Base64ImageDeserializer.class)
-    @JsonSerialize(using = Base64ImageSerializer.class)
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private byte[] threeProductImage;
+    @Column(columnDefinition = "TEXT")
+    private String threeProductImage;
 
     @Column(columnDefinition = "TEXT")
     private String benefitsParagraph;

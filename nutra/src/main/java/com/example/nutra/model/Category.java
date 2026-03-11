@@ -1,16 +1,7 @@
 package com.example.nutra.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Column;
-import com.example.nutra.config.Base64ImageDeserializer;
-import com.example.nutra.config.Base64ImageSerializer;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import jakarta.persistence.Lob;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
@@ -35,9 +26,6 @@ public class Category {
     @Column(columnDefinition = "TEXT")
     private String shortDescription;
 
-    @Lob
-    @Column(columnDefinition = "LONGBLOB")
-    @JsonSerialize(using = Base64ImageSerializer.class)
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private byte[] image;
+    @Column(columnDefinition = "TEXT")
+    private String image;
 }

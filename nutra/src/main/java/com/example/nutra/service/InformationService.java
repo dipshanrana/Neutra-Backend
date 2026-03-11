@@ -15,12 +15,13 @@ import java.util.List;
 public class InformationService {
 
     private final InformationRepository informationRepository;
+    private final FileStorageService fileStorageService;
 
-    public Information addInformation(Information info, MultipartFile image) throws IOException {
+    public Information addInformation(Information information, MultipartFile image) throws IOException {
         if (image != null && !image.isEmpty()) {
-            info.setImage(image.getBytes());
+            information.setImage(fileStorageService.storeFile(image));
         }
-        return informationRepository.save(info);
+        return informationRepository.save(information);
     }
 
     public List<Information> getAllInformation() {
@@ -32,19 +33,22 @@ public class InformationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Information not found with ID " + id));
     }
 
-    public Information updateInformation(Long id, Information updatedInfo, MultipartFile image) throws IOException {
-        Information existingInfo = getInformationById(id);
-        existingInfo.setTitle(updatedInfo.getTitle());
-        existingInfo.setContent(updatedInfo.getContent());
-        existingInfo.setCategory(updatedInfo.getCategory());
+    public Information updateInformation(Long id, Information infoDetails, MultipartFile image) throws IOException {
+        Information info = getInformationById(id);
+        info.setTitle(infoDetails.getTitle());
+        info.setContent(infoDetails.getContent());
+        info.setCategory(infoDetails.getCategory());
+
         if (image != null && !image.isEmpty()) {
-            existingInfo.setImage(image.getBytes());
+            fileStorageService.deleteFile(info.getImage());
+            info.setImage(fileStorageService.storeFile(image));
         }
-        return informationRepository.save(existingInfo);
+        return informationRepository.save(info);
     }
 
     public void deleteInformation(Long id) {
         Information info = getInformationById(id);
+        fileStorageService.deleteFile(info.getImage());
         informationRepository.delete(info);
     }
 }

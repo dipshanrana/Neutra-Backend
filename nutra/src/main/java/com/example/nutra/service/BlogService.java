@@ -5,7 +5,6 @@ import com.example.nutra.model.Blog;
 import com.example.nutra.repository.BlogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
@@ -15,10 +14,11 @@ import java.util.List;
 public class BlogService {
 
     private final BlogRepository blogRepository;
+    private final FileStorageService fileStorageService;
 
     public Blog addBlog(Blog blog, MultipartFile image) throws IOException {
         if (image != null && !image.isEmpty()) {
-            blog.setImage(image.getBytes());
+            blog.setImage(fileStorageService.storeFile(image));
         }
         return blogRepository.save(blog);
     }
@@ -32,20 +32,23 @@ public class BlogService {
                 .orElseThrow(() -> new ResourceNotFoundException("Blog not found with ID " + id));
     }
 
-    public Blog updateBlog(Long id, Blog updatedBlog, MultipartFile image) throws IOException {
-        Blog existingBlog = getBlogById(id);
-        existingBlog.setTitle(updatedBlog.getTitle());
-        existingBlog.setContent(updatedBlog.getContent());
-        existingBlog.setAuthor(updatedBlog.getAuthor());
-        existingBlog.setRelatedProducts(updatedBlog.getRelatedProducts());
+    public Blog updateBlog(Long id, Blog blogDetails, MultipartFile image) throws IOException {
+        Blog blog = getBlogById(id);
+        blog.setTitle(blogDetails.getTitle());
+        blog.setContent(blogDetails.getContent());
+        blog.setAuthor(blogDetails.getAuthor());
+        blog.setRelatedProducts(blogDetails.getRelatedProducts());
+
         if (image != null && !image.isEmpty()) {
-            existingBlog.setImage(image.getBytes());
+            fileStorageService.deleteFile(blog.getImage());
+            blog.setImage(fileStorageService.storeFile(image));
         }
-        return blogRepository.save(existingBlog);
+        return blogRepository.save(blog);
     }
 
     public void deleteBlog(Long id) {
-        Blog blog = getBlogById(id);
-        blogRepository.delete(blog);
+        Blog b = getBlogById(id);
+        fileStorageService.deleteFile(b.getImage());
+        blogRepository.deleteById(id);
     }
 }

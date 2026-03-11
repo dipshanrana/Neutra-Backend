@@ -9,6 +9,11 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -28,10 +33,15 @@ public class ProjectDataSeeder implements CommandLineRunner {
     @Value("${admin.password:admin123}")
     private String adminPassword;
 
-    private static final String MOCK_IMAGE = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==";
+    @Value("${file.upload-dir:uploads}")
+    private String uploadDir;
+
+    private static final String MOCK_IMAGE_BASE64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==";
+    private static final String PLACEHOLDER_URL = "/uploads/placeholder.png";
 
     @Override
     public void run(String... args) throws Exception {
+        createPlaceholderFile();
         if (categoryRepository.count() > 0) {
             System.out.println("Database already seeded. Skipping...");
             return;
@@ -72,7 +82,7 @@ public class ProjectDataSeeder implements CommandLineRunner {
                     .svg("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 2L2 7l10 5 10-5-10-5z'/></svg>")
                     .badge("NEW")
                     .shortDescription("High-quality " + name.toLowerCase() + " for your health.")
-                    .image(Base64.getDecoder().decode(MOCK_IMAGE))
+                    .image(PLACEHOLDER_URL)
                     .build();
             categories.add(categoryRepository.save(cat));
         }
@@ -92,8 +102,10 @@ public class ProjectDataSeeder implements CommandLineRunner {
                     .threeProductMp(150.0 + i)
                     .threeProductSp(110.0 + i)
                     .discount(10.0)
-                    .featuredImages(Arrays.asList(Base64.getDecoder().decode(MOCK_IMAGE), Base64.getDecoder().decode(MOCK_IMAGE)))
-                    .singleProductImage(Base64.getDecoder().decode(MOCK_IMAGE))
+                    .featuredImages(Arrays.asList(PLACEHOLDER_URL, PLACEHOLDER_URL))
+                    .singleProductImage(PLACEHOLDER_URL)
+                    .twoProductImage(PLACEHOLDER_URL)
+                    .threeProductImage(PLACEHOLDER_URL)
                     .benefitsParagraph("These are the benefits of using Product " + i + ". It helps you stay healthy.")
                     .benefits(Arrays.asList(
                             new ProductBenefit("<svg>...</svg>", "Benefit 1 for Product " + i),
@@ -132,7 +144,7 @@ public class ProjectDataSeeder implements CommandLineRunner {
                     .title("Healthy Living Tip #" + i)
                     .content("<p>This is a healthy living tip content for blog " + i + ". Always stay hydrated and eat clean.</p>")
                     .author("Nutra Expert")
-                    .image(Base64.getDecoder().decode(MOCK_IMAGE))
+                    .image(PLACEHOLDER_URL)
                     .build();
             blogRepository.save(blog);
         }
@@ -142,12 +154,25 @@ public class ProjectDataSeeder implements CommandLineRunner {
             Information info = Information.builder()
                     .title("Nutra Policy " + i)
                     .content("This is the detailed content for Policy " + i + ". We value our customers and their health.")
-                    .image(Base64.getDecoder().decode(MOCK_IMAGE))
+                    .image(PLACEHOLDER_URL)
                     .category(categories.get(0))
                     .build();
             informationRepository.save(info);
         }
 
         System.out.println("Data seeding completed successfully.");
+    }
+
+    private void createPlaceholderFile() throws IOException {
+        Path path = Paths.get(uploadDir).toAbsolutePath().normalize();
+        if (!Files.exists(path)) {
+            Files.createDirectories(path);
+        }
+        Path placeholder = path.resolve("placeholder.png");
+        if (!Files.exists(placeholder)) {
+            byte[] bytes = Base64.getDecoder().decode(MOCK_IMAGE_BASE64);
+            Files.copy(new ByteArrayInputStream(bytes), placeholder);
+            System.out.println("Placeholder image created at: " + placeholder);
+        }
     }
 }
