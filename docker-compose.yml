@@ -1,33 +1,18 @@
 version: '3.8'
 
 services:
-  db:
-    image: mysql:8.4
-    container_name: nutra-mysql
-    restart: always
-    environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
-      MYSQL_DATABASE: nutra
-    ports:
-      - "3307:3306"
-    volumes:
-      - mysql-data:/var/lib/mysql
-    command: --max_allowed_packet=64M
-
   app:
     build: .
     container_name: nutra-app
     restart: always
     ports:
-      - "8085:8085"
+      - "${SERVER_PORT:-8079}:${SERVER_PORT:-8079}"
     environment:
-      - DB_HOST=db
-      - DB_PORT=3306
-      - DB_NAME=nutra
-      - DB_USER=root
-      - DB_PASSWORD=
-    depends_on:
-      - db
+      - SERVER_PORT=${SERVER_PORT:-8079}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT:-3306}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
 
-volumes:
-  mysql-data:
+# Note: Local db service removed as we are using an external production database.
