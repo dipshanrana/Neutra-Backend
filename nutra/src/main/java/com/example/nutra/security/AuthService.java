@@ -98,4 +98,25 @@ public class AuthService {
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
+
+    public User deactivateUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found: " + userId));
+        user.setActive(false);
+        return userRepository.save(user);
+    }
+
+    public User activateUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found: " + userId));
+        user.setActive(true);
+        return userRepository.save(user);
+    }
+
+    public void deleteUser(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new RuntimeException("User not found: " + userId);
+        }
+        userRepository.deleteById(userId);
+    }
 }

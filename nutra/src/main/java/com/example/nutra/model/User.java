@@ -38,8 +38,36 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private RoleType role;
 
+    /**
+     * Controls whether this account is active.
+     * Deactivated users cannot log in. Defaults to true.
+     */
+    @Builder.Default
+    private boolean isActive = true;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+    }
+
+    /** Spring Security blocks login automatically when isEnabled() = false. */
+    @Override
+    public boolean isEnabled() {
+        return isActive;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return isActive;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
     }
 }
