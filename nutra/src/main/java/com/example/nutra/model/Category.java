@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Column;
 import com.example.nutra.config.Base64ImageDeserializer;
 import com.example.nutra.config.Base64ImageSerializer;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.Lob;
@@ -36,7 +37,7 @@ public class Category {
 
     @Lob
     @Column(columnDefinition = "LONGBLOB")
-    @JsonDeserialize(using = Base64ImageDeserializer.class)
     @JsonSerialize(using = Base64ImageSerializer.class)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private byte[] image;
 }

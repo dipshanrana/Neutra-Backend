@@ -2,6 +2,7 @@ package com.example.nutra.model;
 
 import com.example.nutra.config.Base64ImageDeserializer;
 import com.example.nutra.config.Base64ImageSerializer;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
@@ -46,26 +47,27 @@ public class Product {
     @CollectionTable(name = "product_featured_images", joinColumns = @JoinColumn(name = "product_id"))
     @Lob
     @Column(name = "feature_image_data", columnDefinition = "LONGBLOB")
-    @JsonDeserialize(contentUsing = Base64ImageDeserializer.class)
-    @JsonSerialize(contentUsing = Base64ImageSerializer.class)
+    @JsonSerialize(using = Base64ImageSerializer.class)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private List<byte[]> featuredImages;
 
     @Lob
     @Column(columnDefinition = "LONGBLOB")
-    @JsonDeserialize(using = Base64ImageDeserializer.class)
     @JsonSerialize(using = Base64ImageSerializer.class)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private byte[] singleProductImage;
 
     @Lob
     @Column(columnDefinition = "LONGBLOB")
-    @JsonDeserialize(using = Base64ImageDeserializer.class)
     @JsonSerialize(using = Base64ImageSerializer.class)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private byte[] twoProductImage;
 
     @Lob
     @Column(columnDefinition = "LONGBLOB")
     @JsonDeserialize(using = Base64ImageDeserializer.class)
     @JsonSerialize(using = Base64ImageSerializer.class)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private byte[] threeProductImage;
 
     @Column(columnDefinition = "TEXT")

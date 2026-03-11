@@ -1,10 +1,10 @@
-                # Nutra Backend — API Endpoints Documentation
+# Nutra Backend — API Endpoints Documentation
 
-                > **Base URL:** `http://localhost:8079/api`
-                > **Base Currency:** `USD` (All product prices are entered in USD)
-                >
-                > All endpoints below are relative to this base URL.
-                > For example, `POST /auth/login` means `POST http://localhost:8079/api/auth/login`
+> **Base URL:** `http://209.126.86.149:8079`
+> **Base Currency:** `USD` (All product prices are entered in USD)
+>
+> All endpoints below are relative to this base URL.
+> For example, `POST /auth/login` means `POST http://209.126.86.149:8079/auth/login`
 
                 ---
 
@@ -450,7 +450,7 @@
                 formData.append('threeProductImage', fileInput3.files[0]);
 
                 // 3. Send request
-                fetch('/api/products', {
+                fetch('/products', {
                   method: 'POST',
                   headers: { 'Authorization': 'Bearer ' + token },
                   body: formData // Content-Type is set automatically by the browser
@@ -1090,15 +1090,20 @@
 
                 ---
 
-                ## 12. Working with Images (Frontend Guide)
+                ### 12. Working with Images (Frontend Guide)
 
-                ### 9.1 Uploading Images (Multipart/Form-Data)
-                When creating or updating a product, images must be sent as binary files using the `FormData` browser API. Do **not** send raw JSON for these endpoints.
+#### 🚀 Performance Warning: Use Binary Multipart Uploads
+Do **not** send image data as Base64 strings inside the JSON payload. This causes massive request sizes and slow processing.
 
-                **Steps:**
-                1.  Construct a `FormData` object.
-                2.  Attach the product JSON as a `Blob` with type `application/json`.
-                3.  Attach individual or lists of files.
+**The backend is optimized to ignore image fields in JSON.** Instead, always use the `MultipartFile` parts (binary) which are significantly faster and more reliable for large files.
+
+#### 9.1 Uploading Images (Multipart/Form-Data)
+When creating or updating a product, images must be sent as binary files using the `FormData` browser API. 
+
+**Steps:**
+1.  Construct a `FormData` object.
+2.  Attach the product JSON as a `Blob` with type `application/json` (exclude image fields).
+3.  Attach individual or lists of files as binary parts.
 
                 ```javascript
                 const formData = new FormData();

@@ -1,6 +1,7 @@
 package com.example.nutra.model;
 
 import com.example.nutra.config.Base64ImageSerializer;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,6 +26,7 @@ public class Information {
     @Lob
     @Column(columnDefinition = "LONGBLOB")
     @JsonSerialize(using = Base64ImageSerializer.class)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private byte[] image;
 
     // As requested: information model which will be linked to all categories
