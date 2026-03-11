@@ -15,6 +15,9 @@ public class AdminDataSeeder implements CommandLineRunner {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @org.springframework.beans.factory.annotation.Value("${admin.password}")
+    private String adminPassword;
+
     @Override
     public void run(String... args) throws Exception {
         // Check if an admin already exists using the default static admin
@@ -24,11 +27,11 @@ public class AdminDataSeeder implements CommandLineRunner {
         if (userRepository.findByUsername(adminUsername) == null) {
             Admin staticAdmin = new Admin();
             staticAdmin.setUsername(adminUsername);
-            staticAdmin.setPassword(passwordEncoder.encode("admin123"));
+            staticAdmin.setPassword(passwordEncoder.encode(adminPassword));
             staticAdmin.setRole(RoleType.ADMIN);
 
             userRepository.save(staticAdmin);
-            System.out.println("Static admin initialized: admin@admin.com / admin123");
+            System.out.println("Static admin initialized: admin@admin.com / " + adminPassword);
         }
     }
 }
