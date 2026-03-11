@@ -28,8 +28,12 @@ public class ProductController {
             @RequestPart(value = "twoProductImage", required = false) MultipartFile twoProductImage,
             @RequestPart(value = "threeProductImage", required = false) MultipartFile threeProductImage)
             throws IOException {
+        System.out.println(">>> SAVING PRODUCT REQUEST: " + product);
+        if (featuredImages != null)
+            System.out.println(">>> FEATURED IMAGES: " + featuredImages.size() + " files");
         Product savedProduct = productService.addProduct(product, featuredImages, singleProductImage, twoProductImage,
                 threeProductImage);
+        System.out.println("<<< SAVED PRODUCT RESPONSE ID: " + savedProduct.getId());
         return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
     }
 
@@ -82,8 +86,11 @@ public class ProductController {
             @RequestPart(value = "twoProductImage", required = false) MultipartFile twoProductImage,
             @RequestPart(value = "threeProductImage", required = false) MultipartFile threeProductImage)
             throws IOException {
-        return ResponseEntity.ok(productService.updateProduct(id, product, featuredImages, singleProductImage,
-                twoProductImage, threeProductImage));
+        System.out.println(">>> UPDATING PRODUCT ID: " + id + " | REQUEST: " + product);
+        Product updated = productService.updateProduct(id, product, featuredImages, singleProductImage,
+                twoProductImage, threeProductImage);
+        System.out.println("<<< UPDATED PRODUCT RESPONSE ID: " + updated.getId());
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")

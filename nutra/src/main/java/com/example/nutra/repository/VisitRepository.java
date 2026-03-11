@@ -12,4 +12,5 @@ public interface VisitRepository extends JpaRepository<AnalyticsVisit, Long> {
 
     @Query("SELECT v.country, COUNT(v) FROM AnalyticsVisit v GROUP BY v.country")
     List<Object[]> countVisitsByCountry();
+
 }

@@ -27,8 +27,8 @@ public class AnalyticsVisit {
     private Long id;
 
     private String ipAddress;
-
     private String country;
-
+    private String username;
+    private String reason;
     private LocalDateTime visitedAt;
 }

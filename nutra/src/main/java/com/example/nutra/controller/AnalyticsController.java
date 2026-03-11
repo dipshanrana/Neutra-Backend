@@ -1,5 +1,6 @@
 package com.example.nutra.controller;
 
+import com.example.nutra.model.AnalyticsVisit;
 import com.example.nutra.service.AnalyticsService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +20,30 @@ public class AnalyticsController {
     private final AnalyticsService analyticsService;
 
     @PostMapping("/record")
-    public ResponseEntity<Map<String, String>> recordVisit(HttpServletRequest request) {
-        String ipAddress = request.getHeader("X-Forwarded-For");
+    public ResponseEntity<Map<String, String>> recordVisit(HttpServletRequest request,
+            @RequestBody(required = false) Map<String, String> body) {
+        String[] IP_HEADERS = {
+                "X-Forwarded-For",
+                "Proxy-Client-IP",
+                "WL-Proxy-Client-IP",
+                "HTTP_X_FORWARDED_FOR",
+                "HTTP_X_FORWARDED",
+                "HTTP_X_CLUSTER_CLIENT_IP",
+                "HTTP_CLIENT_IP",
+                "HTTP_FORWARDED_FOR",
+                "HTTP_FORWARDED",
+                "HTTP_VIA",
+                "REMOTE_ADDR"
+        };
+
+        String ipAddress = null;
+        for (String header : IP_HEADERS) {
+            ipAddress = request.getHeader(header);
+            if (ipAddress != null && !ipAddress.isEmpty() && !"unknown".equalsIgnoreCase(ipAddress)) {
+                break;
+            }
+        }
+
         if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
             ipAddress = request.getRemoteAddr();
         }
@@ -29,7 +52,10 @@ public class AnalyticsController {
             ipAddress = ipAddress.split(",")[0].trim();
         }
 
-        analyticsService.recordVisit(ipAddress);
+        String username = body != null ? body.get("username") : "Guest";
+        String reason = body != null ? body.get("reason") : "Direct Visit";
+
+        analyticsService.recordVisit(ipAddress, username, reason);
 
         Map<String, String> response = new HashMap<>();
         response.put("message", "Visit recorded");
@@ -40,6 +66,7 @@ public class AnalyticsController {
     public ResponseEntity<Map<String, Object>> getStats() {
         long totalVisits = analyticsService.getTotalVisits();
         List<Object[]> countryStats = analyticsService.getVisitsByCountry();
+        List<AnalyticsVisit> allVisits = analyticsService.getAllVisits();
 
         Map<String, Object> response = new HashMap<>();
         response.put("totalVisits", totalVisits);
@@ -52,6 +79,7 @@ public class AnalyticsController {
             byCountry.add(stat);
         }
         response.put("byCountry", byCountry);
+        response.put("allVisits", allVisits);
 
         return ResponseEntity.ok(response);
     }

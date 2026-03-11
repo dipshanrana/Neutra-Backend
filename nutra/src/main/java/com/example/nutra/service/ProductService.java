@@ -130,6 +130,7 @@ public class ProductService {
         existingProduct.setThreeProductSp(productDetails.getThreeProductSp());
 
         existingProduct.setDiscount(productDetails.getDiscount());
+        existingProduct.setBenefitsParagraph(productDetails.getBenefitsParagraph());
         existingProduct.setBenefits(productDetails.getBenefits());
 
         if (featuredImages != null && !featuredImages.isEmpty()) {

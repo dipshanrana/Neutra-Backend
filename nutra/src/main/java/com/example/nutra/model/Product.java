@@ -15,6 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString(exclude = { "featuredImages", "singleProductImage", "twoProductImage", "threeProductImage" })
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -66,6 +67,9 @@ public class Product {
     @JsonDeserialize(using = Base64ImageDeserializer.class)
     @JsonSerialize(using = Base64ImageSerializer.class)
     private byte[] threeProductImage;
+
+    @Column(columnDefinition = "TEXT")
+    private String benefitsParagraph;
 
     @ElementCollection
     @CollectionTable(name = "product_benefits", joinColumns = @JoinColumn(name = "product_id"))

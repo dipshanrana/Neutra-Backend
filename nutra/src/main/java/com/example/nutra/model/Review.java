@@ -10,6 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString(exclude = "product")
 public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
