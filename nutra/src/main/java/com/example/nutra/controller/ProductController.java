@@ -98,4 +98,16 @@ public class ProductController {
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/search/badge")
+    public ResponseEntity<List<Product>> searchByBadge(@RequestParam String badge) {
+        return ResponseEntity.ok(productService.searchByBadge(badge));
+    }
+
+    @GetMapping("/search/category-badge")
+    public ResponseEntity<List<Product>> searchByCategoryBadge(
+            @RequestParam String badge,
+            @RequestParam String category) {
+        return ResponseEntity.ok(productService.searchByCategoryBadge(badge, category));
+    }
 }

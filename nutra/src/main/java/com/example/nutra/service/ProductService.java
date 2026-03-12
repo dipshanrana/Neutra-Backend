@@ -198,4 +198,12 @@ public class ProductService {
         fileStorageService.deleteFile(p.getThreeProductImage());
         productRepository.deleteById(id);
     }
+
+    public List<Product> searchByBadge(String badge) {
+        return productRepository.findByBadgeIgnoreCase(badge);
+    }
+
+    public List<Product> searchByCategoryBadge(String categoryBadge, String categoryName) {
+        return productRepository.findByCategoryBadgeIgnoreCaseAndCategoryNameIgnoreCase(categoryBadge, categoryName);
+    }
 }

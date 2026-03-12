@@ -689,6 +689,37 @@ The seeder also creates:
 
                 ---
 
+                ### 5.4 Search by Global Badge
+
+                | Property        | Value                                          |
+                |-----------------|------------------------------------------------|
+                | **Method**      | `GET`                                          |
+                | **URL**         | `/products/search/badge?badge={badgeName}`     |
+                | **Auth**        | None (Public)                                  |
+                | **Query Param** | `badge` — global badge name (e.g. HOT, NEW)    |
+
+                **Example:** `GET /products/search/badge?badge=HOT`
+
+                **Success Response (200 OK):** `List<Product>`
+
+                ---
+
+                ### 5.5 Search by Category Badge
+
+                | Property        | Value                                                  |
+                |-----------------|--------------------------------------------------------|
+                | **Method**      | `GET`                                                  |
+                | **URL**         | `/products/search/category-badge?badge={B}&category={C}`|
+                | **Auth**        | None (Public)                                          |
+                | **Query Params**| `badge` — e.g. "1 BEST SELLER"                        |
+                |                 | `category` — e.g. "Supplements"                       |
+
+                **Example:** `GET /products/search/category-badge?badge=1+BEST+SELLER&category=Supplements`
+
+                **Success Response (200 OK):** `List<Product>`
+
+                ---
+
                 ---
 
                 ## 6. Blog Endpoints
@@ -1102,6 +1133,8 @@ The seeder also creates:
                 | 39 | `GET`    | `/currency/product/{id}`                 | None         | Convert all product prices (one call)    |
                 | 40 | `GET`    | `/blogs/category/{name}`                 | None         | Get blogs by category name               |
                 | 41 | `GET`    | `/information/category/{name}`           | None         | Get info pages by category name          |
+                | 42 | `GET`    | `/products/search/badge`                 | None         | Search products by global badge          |
+                | 43 | `GET`    | `/products/search/category-badge`        | None         | Search products by category-specific badge|
                 ---
 
                 ---
