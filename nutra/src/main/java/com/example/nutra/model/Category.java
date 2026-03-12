@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Getter
 @Setter
@@ -23,9 +26,20 @@ public class Category {
 
     private String badge;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT") 
     private String shortDescription;
 
-    @Column(columnDefinition = "TEXT")
     private String image;
+
+    @OneToMany(mappedBy = "category")
+    @JsonIgnore
+    private List<Product> products;
+
+    @OneToMany(mappedBy = "category")
+    @JsonIgnore
+    private List<Information> informationPages;
+
+    @OneToMany(mappedBy = "category")
+    @JsonIgnore
+    private List<Blog> blogs;
 }

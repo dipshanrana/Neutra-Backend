@@ -3,6 +3,7 @@ package com.example.nutra.service;
 import com.example.nutra.Exception.ResourceNotFoundException;
 import com.example.nutra.model.Blog;
 import com.example.nutra.repository.BlogRepository;
+import com.example.nutra.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,9 +15,17 @@ import java.util.List;
 public class BlogService {
 
     private final BlogRepository blogRepository;
+    private final CategoryRepository categoryRepository;
     private final FileStorageService fileStorageService;
 
     public Blog addBlog(Blog blog, MultipartFile image) throws IOException {
+        if (blog.getCategory() != null) {
+            com.example.nutra.model.Category cat = categoryRepository.findByNameIgnoreCase(blog.getCategory().getName());
+            if (cat == null) {
+                cat = categoryRepository.save(blog.getCategory());
+            }
+            blog.setCategory(cat);
+        }
         if (image != null && !image.isEmpty()) {
             blog.setImage(fileStorageService.storeFile(image));
         }
@@ -38,6 +47,13 @@ public class BlogService {
         blog.setContent(blogDetails.getContent());
         blog.setAuthor(blogDetails.getAuthor());
         blog.setRelatedProducts(blogDetails.getRelatedProducts());
+        if (blogDetails.getCategory() != null) {
+            com.example.nutra.model.Category cat = categoryRepository.findByNameIgnoreCase(blogDetails.getCategory().getName());
+            if (cat == null) {
+                cat = categoryRepository.save(blogDetails.getCategory());
+            }
+            blog.setCategory(cat);
+        }
 
         if (image != null && !image.isEmpty()) {
             fileStorageService.deleteFile(blog.getImage());
@@ -50,5 +66,9 @@ public class BlogService {
         Blog b = getBlogById(id);
         fileStorageService.deleteFile(b.getImage());
         blogRepository.deleteById(id);
+    }
+
+    public List<Blog> getBlogsByCategory(String categoryName) {
+        return blogRepository.findByCategoryNameIgnoreCase(categoryName);
     }
 }

@@ -43,14 +43,15 @@ public class Product {
     @Column(name = "feature_image_url")
     private List<String> featuredImages;
 
-    @Column(columnDefinition = "TEXT")
     private String singleProductImage;
 
-    @Column(columnDefinition = "TEXT")
     private String twoProductImage;
 
-    @Column(columnDefinition = "TEXT")
     private String threeProductImage;
+
+    private String badge;
+
+    private String categoryBadge;
 
     @Column(columnDefinition = "TEXT")
     private String benefitsParagraph;

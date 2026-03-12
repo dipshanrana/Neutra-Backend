@@ -50,4 +50,9 @@ public class BlogController {
         blogService.deleteBlog(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/category/{categoryName}")
+    public ResponseEntity<List<Blog>> getBlogsByCategory(@PathVariable String categoryName) {
+        return ResponseEntity.ok(blogService.getBlogsByCategory(categoryName));
+    }
 }

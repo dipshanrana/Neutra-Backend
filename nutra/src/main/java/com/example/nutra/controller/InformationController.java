@@ -50,4 +50,9 @@ public class InformationController {
         informationService.deleteInformation(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/category/{categoryName}")
+    public ResponseEntity<List<Information>> getInformationByCategory(@PathVariable String categoryName) {
+        return ResponseEntity.ok(informationService.getInformationByCategory(categoryName));
+    }
 }

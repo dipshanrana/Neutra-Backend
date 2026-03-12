@@ -102,6 +102,8 @@ public class ProjectDataSeeder implements CommandLineRunner {
                     .threeProductMp(150.0 + i)
                     .threeProductSp(110.0 + i)
                     .discount(10.0)
+                    .badge(i % 2 == 0 ? "NEW" : "HOT")
+                    .categoryBadge((i % 5 + 1) + " BEST SELLER")
                     .featuredImages(Arrays.asList(PLACEHOLDER_URL, PLACEHOLDER_URL))
                     .singleProductImage(PLACEHOLDER_URL)
                     .twoProductImage(PLACEHOLDER_URL)
@@ -145,6 +147,7 @@ public class ProjectDataSeeder implements CommandLineRunner {
                     .content("<p>This is a healthy living tip content for blog " + i + ". Always stay hydrated and eat clean.</p>")
                     .author("Nutra Expert")
                     .image(PLACEHOLDER_URL)
+                    .category(categories.get(i % categories.size()))
                     .build();
             blogRepository.save(blog);
         }

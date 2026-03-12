@@ -3,6 +3,7 @@ package com.example.nutra.service;
 import com.example.nutra.Exception.ResourceNotFoundException;
 import com.example.nutra.model.Information;
 import com.example.nutra.repository.InformationRepository;
+import com.example.nutra.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,9 +16,17 @@ import java.util.List;
 public class InformationService {
 
     private final InformationRepository informationRepository;
+    private final CategoryRepository categoryRepository;
     private final FileStorageService fileStorageService;
 
     public Information addInformation(Information information, MultipartFile image) throws IOException {
+        if (information.getCategory() != null) {
+            com.example.nutra.model.Category cat = categoryRepository.findByNameIgnoreCase(information.getCategory().getName());
+            if (cat == null) {
+                cat = categoryRepository.save(information.getCategory());
+            }
+            information.setCategory(cat);
+        }
         if (image != null && !image.isEmpty()) {
             information.setImage(fileStorageService.storeFile(image));
         }
@@ -37,7 +46,13 @@ public class InformationService {
         Information info = getInformationById(id);
         info.setTitle(infoDetails.getTitle());
         info.setContent(infoDetails.getContent());
-        info.setCategory(infoDetails.getCategory());
+        if (infoDetails.getCategory() != null) {
+            com.example.nutra.model.Category cat = categoryRepository.findByNameIgnoreCase(infoDetails.getCategory().getName());
+            if (cat == null) {
+                cat = categoryRepository.save(infoDetails.getCategory());
+            }
+            info.setCategory(cat);
+        }
 
         if (image != null && !image.isEmpty()) {
             fileStorageService.deleteFile(info.getImage());
@@ -50,5 +65,9 @@ public class InformationService {
         Information info = getInformationById(id);
         fileStorageService.deleteFile(info.getImage());
         informationRepository.delete(info);
+    }
+
+    public List<Information> getInformationByCategory(String categoryName) {
+        return informationRepository.findByCategoryNameIgnoreCase(categoryName);
     }
 }

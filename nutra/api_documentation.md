@@ -399,6 +399,8 @@ The seeder also creates:
                       "twoProductSp": 5000.0,
                       "threeProductMp": 10500.0,
                       "threeProductSp": 7000.0,
+                      "badge": "HOT",
+                      "categoryBadge": "1 BEST SELLER",
                       "benefitsParagraph": "Our premium whey protein isolate is designed for athletes who demand the best. It provides a clean source of protein that is rapidly absorbed by the body.",
                       "benefits": [
                         {
@@ -487,6 +489,8 @@ The seeder also creates:
                   "singleProductImage": "/uploads/single.png",
                   "twoProductImage": "/uploads/two.png",
                   "threeProductImage": "/uploads/three.png",
+                  "badge": "HOT",
+                  "categoryBadge": "1 BEST SELLER",
                   "benefitsParagraph": "Our premium whey protein isolate is designed for athletes who demand the best...",
                   "benefits": [
                     {
@@ -709,6 +713,9 @@ The seeder also creates:
                   "title": "Top 5 Supplements for Beginners",
                   "content": "Here are the top supplements every beginner should consider when starting their fitness journey...",
                   "author": "Admin",
+                  "category": {
+                    "name": "Supplements"
+                  },
                   "relatedProducts": [
                     { "id": 1 },
                     { "id": 3 }
@@ -724,6 +731,11 @@ The seeder also creates:
                   "content": "Here are the top supplements every beginner should consider...",
                   "author": "Admin",
                   "image": "/uploads/blog1.png",
+                  "category": {
+                    "id": 1,
+                    "name": "Supplements",
+                    "svg": "<svg>...</svg>"
+                  },
                   "relatedProducts": [ ... ]
                 }
                 ```
@@ -1088,6 +1100,8 @@ The seeder also creates:
                 | 37 | `GET`    | `/currency/rates`                        | None         | Get all latest rates (base USD)          |
                 | 38 | `GET`    | `/currency/convert`                      | None         | Convert single USD amount                |
                 | 39 | `GET`    | `/currency/product/{id}`                 | None         | Convert all product prices (one call)    |
+                | 40 | `GET`    | `/blogs/category/{name}`                 | None         | Get blogs by category name               |
+                | 41 | `GET`    | `/information/category/{name}`           | None         | Get info pages by category name          |
                 ---
 
                 ---

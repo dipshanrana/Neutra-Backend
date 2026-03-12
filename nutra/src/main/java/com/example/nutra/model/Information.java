@@ -20,7 +20,6 @@ public class Information {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @Column(columnDefinition = "TEXT")
     private String image;
 
     // As requested: information model which will be linked to all categories

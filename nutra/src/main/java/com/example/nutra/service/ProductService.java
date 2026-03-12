@@ -131,6 +131,8 @@ public class ProductService {
         existingProduct.setThreeProductSp(productDetails.getThreeProductSp());
 
         existingProduct.setDiscount(productDetails.getDiscount());
+        existingProduct.setBadge(productDetails.getBadge());
+        existingProduct.setCategoryBadge(productDetails.getCategoryBadge());
         existingProduct.setBenefitsParagraph(productDetails.getBenefitsParagraph());
         existingProduct.setBenefits(productDetails.getBenefits());
 

@@ -23,8 +23,11 @@ public class Blog {
 
     private String author;
 
-    @Column(columnDefinition = "TEXT")
     private String image;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = true)
+    private Category category;
 
     // A blog can be related to single or multiple products
     @ManyToMany
