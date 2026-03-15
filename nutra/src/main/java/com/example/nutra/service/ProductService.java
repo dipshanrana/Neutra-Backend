@@ -28,18 +28,7 @@ public class ProductService {
 
     public Product addProduct(Product product, List<MultipartFile> featuredImages, MultipartFile singleProductImage,
             MultipartFile twoProductImage, MultipartFile threeProductImage) throws IOException {
-        if (product.getCategory() != null) {
-            Category cat = categoryRepository.findByNameIgnoreCase(product.getCategory().getName());
-            if (cat == null) {
-                cat = categoryRepository.save(product.getCategory());
-            }
-            product.setCategory(cat);
-        }
-        if (product.getReviews() != null) {
-            for (Review r : product.getReviews()) {
-                r.setProduct(product);
-            }
-        }
+        prepareProduct(product);
 
         if (featuredImages != null && !featuredImages.isEmpty()) {
             List<String> imagePaths = new ArrayList<>();
@@ -205,5 +194,30 @@ public class ProductService {
 
     public List<Product> searchByCategoryBadge(String categoryBadge, String categoryName) {
         return productRepository.findByCategoryBadgeIgnoreCaseAndCategoryNameIgnoreCase(categoryBadge, categoryName);
+    }
+
+    public List<Product> addProducts(List<Product> products) {
+        for (Product product : products) {
+            prepareProduct(product);
+            if (product.getFeaturedImages() != null && product.getFeaturedImages().size() > 0 && product.getFeaturedImages().size() != 2) {
+                throw new IllegalArgumentException("Product '" + product.getName() + "' must have exactly 2 featured images if provided.");
+            }
+        }
+        return productRepository.saveAll(products);
+    }
+
+    private void prepareProduct(Product product) {
+        if (product.getCategory() != null) {
+            Category cat = categoryRepository.findByNameIgnoreCase(product.getCategory().getName());
+            if (cat == null) {
+                cat = categoryRepository.save(product.getCategory());
+            }
+            product.setCategory(cat);
+        }
+        if (product.getReviews() != null) {
+            for (Review r : product.getReviews()) {
+                r.setProduct(product);
+            }
+        }
     }
 }

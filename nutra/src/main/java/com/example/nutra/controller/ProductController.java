@@ -37,6 +37,13 @@ public class ProductController {
         return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
     }
 
+    @PostMapping("/bulk")
+    public ResponseEntity<List<Product>> addProducts(@RequestBody List<Product> products) {
+        System.out.println(">>> SAVING BULK PRODUCTS REQUEST: " + products.size() + " items");
+        List<Product> savedProducts = productService.addProducts(products);
+        return new ResponseEntity<>(savedProducts, HttpStatus.CREATED);
+    }
+
     @GetMapping
     public ResponseEntity<List<Product>> getAllProducts() {
         return ResponseEntity.ok(productService.getAllProducts());

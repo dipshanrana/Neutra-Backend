@@ -538,7 +538,44 @@ The seeder also creates:
 
                 ---
 
-                ### 4.2 Get All Products
+                ### 4.2 Bulk Create Products
+
+                | Property    | Value                  |
+                |-------------|------------------------|
+                | **Method**  | `POST`                 |
+                | **URL**     | `/products/bulk`       |
+                | **Auth**    | 🔒 ADMIN              |
+                | **Content-Type** | `application/json` |
+
+                > Saves multiple products in a single request. If a category name doesn't exist, it is automatically created. 
+                > **Note:** Unlike the single product endpoint, this does not support file uploads.
+
+                **Request Body (List of Product Objects):**
+                ```json
+                [
+                  {
+                    "name": "Whey Protein Isolate",
+                    "link": "https://example.com/products/whey-protein",
+                    "category": { "name": "Supplements" },
+                    "description": "Premium whey protein isolate...",
+                    "singleProductMp": 3500.0,
+                    "singleProductSp": 2800.0
+                  },
+                  {
+                    "name": "Vitamin D3",
+                    "category": { "name": "Vitamins" },
+                    "description": "Essential vitamin for bone health...",
+                    "singleProductMp": 1200.0,
+                    "singleProductSp": 950.0
+                  }
+                ]
+                ```
+
+                **Success Response (201 Created):** `List<Product>` (The assigned IDs and full objects)
+
+                ---
+
+                ### 4.3 Get All Products
 
                 | Property    | Value                  |
                 |-------------|------------------------|
@@ -550,7 +587,7 @@ The seeder also creates:
 
                 ---
 
-                ### 4.3 Get Product by ID
+                ### 4.4 Get Product by ID
 
                 | Property    | Value                  |
                 |-------------|------------------------|
@@ -569,7 +606,7 @@ The seeder also creates:
 
                 ---
 
-                ### 4.4 Update Product
+                ### 4.5 Update Product
 
                 | Property    | Value                  |
                 |-------------|------------------------|
@@ -584,7 +621,7 @@ The seeder also creates:
 
                 ---
 
-                ### 4.5 Delete Product
+                ### 4.6 Delete Product
 
                 | Property    | Value                  |
                 |-------------|------------------------|
@@ -596,7 +633,7 @@ The seeder also creates:
 
                 ---
 
-                ### 4.6 Get All Category Names
+                ### 4.7 Get All Category Names
 
                 | Property    | Value                       |
                 |-------------|------------------------------|
@@ -613,7 +650,7 @@ The seeder also creates:
 
                 ---
 
-                ### 4.7 Get Sample Products from 3 Random Categories
+                ### 4.8 Get Sample Products from 3 Random Categories
 
                 | Property    | Value                                    |
                 |-------------|------------------------------------------|
@@ -627,7 +664,7 @@ The seeder also creates:
 
                 ---
 
-                ### 4.8 Get All Products (Random Order)
+                ### 4.9 Get All Products (Random Order)
 
                 | Property    | Value                  |
                 |-------------|------------------------|
